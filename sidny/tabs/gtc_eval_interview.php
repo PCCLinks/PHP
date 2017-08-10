@@ -154,6 +154,44 @@ if($evalReadingScore >0 && $evalMathScore >0 && $gtcWritingAverage != '') $gtcAv
 		    </li>
 	   </ol>
     </fieldset>
+        <fieldset class='group'>
+    <legend>Careers</legend>
+	<ol class='dataform'>
+		    <li>
+			    <label for='careerIndustry'>Career Industry</label>
+			    <select name='careerIndustry' id='careerIndustry' tabindex='3' onchange="validateInterview(this.form.id,this.name,this[this.selectedIndex].value,'gtc', 0)">
+				<option value=''>
+				<option<?php if($careerIndustry== 'Construction') echo ' selected'; ?> value='<?php echo urlencode("Construction");?>'>Construction
+				<option<?php if($careerIndustry== 'Manufacturing') echo ' selected'; ?>  value='<?php echo urlencode("Manufacturing");?>'>Manufacturing
+				<option<?php if($careerIndustry== 'Retail Sales (i.e. retail associate)') echo ' selected'; ?>  value='<?php echo urlencode("Retail Sales (i.e. retail associate)");?>'>Retail Sales (i.e. retail associate)
+				<option<?php if($careerIndustry== 'Transportation & Warehousing (i.e. truck driving & rail)') echo ' selected'; ?> value='<?php echo urlencode("Transportation & Warehousing (i.e. truck driving & rail)");?>' >Transportation & Warehousing (i.e. truck driving & rail)
+				<option<?php if($careerIndustry== 'Information (i.e. telecommunications & book publishing)') echo ' selected'; ?>  value='<?php echo urlencode("Information (i.e. telecommunications & book publishing)");?>'>Information (i.e. telecommunications & book publishing)
+				<option<?php if($careerIndustry== 'Finance') echo ' selected'; ?>  value='<?php echo urlencode("Finance");?>'>Finance
+				<option<?php if($careerIndustry== 'Insurance') echo ' selected'; ?>  value='<?php echo urlencode("Insurance");?>'>Insurance
+				<option<?php if($careerIndustry== 'Real Estate Rental & Leasing') echo ' selected'; ?>  value='<?php echo urlencode("Real Estate Rental & Leasing");?>'>Real Estate Rental & Leasing
+				<option<?php if($careerIndustry== 'Law') echo ' selected'; ?>  value='<?php echo urlencode("Law");?>'>Law
+				<option<?php if($careerIndustry== 'Engineering') echo ' selected'; ?>  value='<?php echo urlencode("Engineering");?>'>Engineering
+				<option<?php if($careerIndustry== 'Design Services') echo ' selected'; ?>  value='<?php echo urlencode("Design Services");?>'>Design Services
+				<option<?php if($careerIndustry== 'Marketing') echo ' selected'; ?>  value='<?php echo urlencode("Marketing");?>'>Marketing
+				<option<?php if($careerIndustry== 'Computer/Information Technology services') echo ' selected'; ?>  value='<?php echo urlencode("Computer/Information Technology services");?>'>Computer/Information Technology services
+				<option<?php if($careerIndustry== 'Science') echo ' selected'; ?>  value='<?php echo urlencode("Science");?>'>Science
+						<option<?php if($careerIndustry== 'Management of Companies and Enterprises') echo ' selected'; ?>  value='<?php echo urlencode("Management of Companies and Enterprises");?>'>Management of Companies and Enterprises
+				<option<?php if($careerIndustry== 'Educational Services (i.e. teachers)') echo ' selected'; ?>  value='<?php echo urlencode("Educational Services (i.e. teachers)");?>'>Educational Services (i.e. teachers)
+				<option<?php if($careerIndustry== 'Health Care') echo ' selected'; ?>  value='<?php echo urlencode("Health Care");?>'>Health Care
+				<option<?php if($careerIndustry== 'Social Services (i.e. counselors and case managers)') echo ' selected'; ?>  value='<?php echo urlencode("Social Services (i.e. counselors and case managers)");?>'>Social Services (i.e. counselors and case managers)
+				<option<?php if($careerIndustry== 'Entertainment') echo ' selected'; ?>  value='<?php echo urlencode("Entertainment");?>'>Entertainment
+				<option<?php if($careerIndustry== 'Recreation') echo ' selected'; ?>  value='<?php echo urlencode("Recreation");?>'>Recreation
+				<option<?php if($careerIndustry== 'Accommodation and Food Services') echo ' selected'; ?>  value='<?php echo urlencode("Accommodation and Food Services");?>'>Accommodation and Food Services
+				<option<?php if($careerIndustry== 'Public Administration (i.e. government)') echo ' selected'; ?>  value='<?php echo urlencode("Public Administration (i.e. government)");?>'>Public Administration (i.e. government)
+				<option<?php if($careerIndustry== 'Other') echo ' selected'; ?>  value='<?php echo urlencode("Other");?>'>Other
+			    </select>
+		    </li>
+		  <li>
+			    <label for=careerOccupation>Career Occupation</label>
+			    <input type='text' name='careerOccupation' id='careerOccupation' class='textInput' tabindex='5' value='<?php echo $careerOccupation?>' onchange="validateInterview(this.form.id,this.name,this.value, 'gtc', 1)"/>
+		    </li>
+	</ol>
+    </fieldset>
 	    </div>
 	    <fieldset class='group'>
        <legend>Evaluation Test Results </legend>
