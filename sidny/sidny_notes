@@ -1,0 +1,704 @@
+
+changed files for the latest release: (12/22/14)
+
+addedit.php (changed on 01/06/15 to fix a glitch)
+function_reports.php
+
+map table copied to ytc at the start
+
+
+
+=============================================================================
+
+xxxxxxxxxxxxxxxxxxxx  Ongoing Database changes in SIDNY  xxxxxxxxxxxxxxxxxxxx
+=============================================================================
+
+XXXXXXXXXXX !!!!BUG!!!! -  Verify ReasonNum field value in DB for exitStatus 
+  with keyStatusID = 138 and 139 XXXXXXXXXXXXXXXXX  03/20/14
+
+---> corrected this bug using the following:
+
+ update sidny.keyStatusReason set reasonNum=58 
+ where reasonArea='exitStatus' and keyStatusReasonID=138; // 58 was 127 earlier
+
+  update sidny.keyStatusReason set reasonNum=59 
+ where reasonArea='exitStatus' and keyStatusReasonID=139; // 59 was 127 earlier
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+XXXXX Check on dependency between exitStatus and exitStatusSecondary through orderNumber XXXXXX
+03/20/14
+---> assuming there is no dependency!
+
+
+************** Adding new "Factors Influencing Decision to drop Out":
+
+insert into keyStatusReason (statusID, reasonNum, reasonText, 
+   reasonArea, ppsRequired, orderNumber) values 
+    (3, 119, 'Certificate Completed', 'exitStatusSecondary', 1, 110);
+ 
+
+columns to check before update/insert new rows:
+1. reasonNum for exitStatus and exitStatusSecondary - different
+2. reasonArea
+3. ppsRequired
+4. orderNumber 
+
+Find the maximum orderNumber and and then add 10 to it to add new rows
+
+Currently active Factors (which show up in the UI): 
+   orderNumber: non-zero 
+   ppsRequired: 1
+   reasonNum: < 100
+
+In-active Factors:
+   orderNumber: 0
+   ppsRequired: 1 or 0 (does not matter?!)
+
+
+* Adding new "Exit Reason":
+
+columns to check before update/insert new rows:
+1. reasonNum for exitStatus and exitStatusSecondary - different
+2. reasonArea
+3. ppsRequired
+4. orderNumber
+
+Find the maximum orderNumber and and then add 10 to it to add new rows
+
+Currently active "Exit Reason" (which show up in the UI): 
+   orderNumber: non-zero 
+   ppsRequired: 0
+   reasonNum: > 100
+
+
+In-active Exit Reasons:
+   orderNumber: 0
+   ppsRequired: 0
+
+example:
+
+insert into sidny.keyStatusReason 
+values (143,3,60,'Exit from YtC Attendance','exitStatus',0,630);
+insert into sidny.keyStatusReason 
+values (144,3,61,'Exit from YtC Credit','exitStatus',0,640);
+insert into sidny.keyStatusReason 
+values (145,3,62,'Exit from YtC ELL Attendance','exitStatus',0,650);
+insert into sidny.keyStatusReason 
+values (146,3,63,'Exit from YtC ELL Credit','exitStatus',0,660);
+
+*************** Course import from banner:
+
+Steps: 
+ 1. Export the current table (bannerCourses) and save it as sql file.
+ 2. Create a table named bannerCourses_until_date and import the saved sql file back into this table.
+ 2. delete the current table (bannerCourses)
+ 3. clean up the new excel data file (sent by Mahmoud) for any commas, or single 
+     quotes; Save as CSV file. 
+ 4. using load in file command, import the new data set into 
+     the empty table. 
+ 5. Verify the data looks correct. 
+ 6. If the difference in the number of rows between the older 
+     and newer data set is significant, contact Mahmoud and 
+     verify that the data set is correct. 
+****************
+
+SET SQL_SAFE_UPDATES=0;
+
+LOAD DATA INFILE ''  
+INTO TABLE
+   bannerCourses 
+FIELDS TERMINATED BY
+  ',' 
+LINES TERMINATED BY
+  '\n' 
+();
+
+
+10/15/14
+
+
+MAP tab - removed;
+Removed: YES+ and MAP+ from statuses (13, 14)
+
+Added the following statuses to the keyStatus table: (13,14,15,16)
+
+YtC Credit
+YtC ELL Credit
+YtC ELL Attendance
+YtC Attendance
+
+Added the four exit reasons that correspond to the four new statuses. 
+
+
+
+files changed:
+ function_reports.php
+ functions.php
+
+
+11/18/14
+
+
+The switch date should be July 1st, 2014.
+
+Any students who entered the YES on or after that date should be switched to YtC attendance 16
+Any students who entered the YES+ on or after that date should be switched to YtC credit 13
+Any students who entered the MAP on or after that date should be switched to YtC ELL attendance 15
+Any students who entered the MAP+ on or after that date should be switched to YtC ELL credit 14
+Students who were enrolled in one of the four programs through that date, should be switched with the original enrollment date.
+Nothing should change for students who left the programs before that date.
+
+old: 
+MAP+ 13
+YES+ 14
+
+MAP:
+SELECT * FROM sidny_test_1014.status where program ='map' and statusDate > '2014-06-30' and keyStatusID in (2,6,7);
+SELECT * FROM sidny_test_1014.status where program ='map' and statusDate > '2014-06-30';
+
+Total = 127 records statusDate > Jun 30, 2014
+
+99 rows: map 2,6,7  
+8 rows:  map 13 MAP+
+15 rows: map 3 
+5 rows:  map 9 Undo
+
+IMPORTANT NOTE: 
+update - made for enrolled statuses as of 11/18/14 (2,6,7) 
+Change the time stamp for each of these statuses
+
+update sidny_test_1014.status set statusDate = date_add(statusDate, INTERVAL 2 HOUR) 
+     where program ='ytc' and statusDate > '2014-06-30' 
+          and keyStatusID = 6;  
+ - 32 rows
+
+update sidny_test_1014.status set statusDate = date_add(statusDate, INTERVAL 4 HOUR) 
+     where program ='ytc' and statusDate > '2014-06-30' 
+          and keyStatusID = 7;
+ - 31 rows
+
+11/19/14
+
+YES: 
+SELECT * FROM sidny_test_1014.status 
+ where keyStatusID = 2 and program='yes' 
+    and statusDate > '2014-06-30';
+228 rows
+
+update sidny_test_1014.status set statusDate = date_add(statusDate, INTERVAL 1 HOUR) 
+     and keyStatusID = 16 and program='ytc'   
+     where program ='yes' and statusDate > '2014-06-30' 
+          and keyStatusID = 2;
+228 rows YtC Attendance
+
+SELECT * FROM sidny_test_1014.status 
+ where keyStatusID = 6 and program='yes' 
+    and statusDate > '2014-06-30';
+144 rows
+
+update sidny_test_1014.status set statusDate = date_add(statusDate, INTERVAL 2 HOUR) 
+     and program='ytc'    
+     where program ='yes' and statusDate > '2014-06-30' 
+          and keyStatusID = 6;
+144 rows
+
+
+SELECT * FROM sidny_test_1014.status 
+ where keyStatusID = 7 and program='yes' 
+    and statusDate > '2014-06-30';
+144 rows
+
+update sidny_test_1014.status set statusDate = date_add(statusDate, INTERVAL 4 HOUR) 
+     and program='ytc'    
+     where program ='yes' and statusDate > '2014-06-30' 
+          and keyStatusID = 7;
+144 rows
+
+SELECT * FROM sidny_test_1014.status 
+ where keyStatusID = 3 and program='yes' 
+    and statusDate > '2014-06-30';
+71 rows
+
+update sidny_test_1014.status set statusDate = date_add(statusDate, INTERVAL 6 HOUR) 
+     and program='ytc'    
+     where program ='yes' and statusDate > '2014-06-30' 
+          and keyStatusID = 3;
+71 rows
+
+
+SELECT * FROM sidny_test_1014.status where program ='map' and statusDate > '2014-06-30' and keyStatusID in (3);
+15 rows
+
+update sidny_test_1014.status set statusDate = date_add(statusDate, INTERVAL 6 HOUR) 
+     and program='ytc'    
+     where program ='map' and statusDate > '2014-06-30' 
+          and keyStatusID = 3;
+
+IMPORTANT: map and yes exits merged as of now. Check this and fix the exit code!! !!!!!!!!!!!!!!!!!!
+
+12/02/2014
+
+SELECT * FROM sidny_test_1014.status where program='map' 
+  and statusDate > '2014-06-30'
+13 rows (8 rows MAP+ and 5 rows undone)
+ ----> this contains some MAP+ (previous keyStatusID=13) entries that need to be changed to YtC ELL credit 
+(new keyStatusID=14)
+
+update sidny_test_1014.status set keyStatusID=14 where keyStatusID=13 and program='map' 
+  and statusDate > '2014-06-30'
+8 rows
+
+
+SELECT * FROM sidny_test_1014.status where program='yes' 
+  and statusDate > '2014-06-30'
+14 rows
+
+old statuses: 1, 9, 10, 12, 14, 13/
+
+update sidny_test_1014.status set program='ytc' and keyStatusID=13 where program='yes' 
+  and keyStatusID=14 and  statusDate > '2014-06-30' 
+26 rows ------ WRONG!!  (may be it changed the good "14" ones to 13?)  !!!!!!!!!!!!!!!!!!!!!!!!
+
+==================================================================================================================
+
+12/04/14
+
+
+SELECT * FROM sidny_test_1014.status 
+ where keyStatusID = 2 and program='yes' 
+    and statusDate > '2014-06-30';
+
+-242 rows
+
+
+update sidny_test_1014.status set statusDate = date_add(statusDate, INTERVAL 1 HOUR) 
+     and keyStatusID = 16 and program='ytc'     
+     where (program ='yes' and statusDate > '2014-06-30' 
+          and keyStatusID = 2 );
+-242 rows
+
+
+SELECT * FROM sidny_test_1014.status 
+ where keyStatusID = 6 and program='yes' 
+    and statusDate > '2014-06-30';
+- 155 rows
+
+update sidny_test_1014.status set statusDate = date_add(statusDate, INTERVAL 2 HOUR) 
+     and program='ytc'    
+     where (program ='yes' and statusDate > '2014-06-30' 
+          and keyStatusID = 6);
+- 155 rows
+
+SELECT * FROM sidny_test_1014.status 
+ where keyStatusID = 7 and program='yes' 
+    and statusDate > '2014-06-30';
+- 155 rows
+
+update sidny_test_1014.status set statusDate = date_add(statusDate, INTERVAL 4 HOUR) 
+     and program='ytc'    
+     where (program ='yes' and statusDate > '2014-06-30' 
+          and keyStatusID = 7);
+- 155 rows
+
+
+SELECT * FROM sidny_test_1014.statusReason where statusID 
+  in (SELECT statusID FROM sidny_test_1014.status 
+ where keyStatusID = 3 and program='yes' 
+    and statusDate > '2014-06-30') ;
+- 143 rows
+
+SET SQL_SAFE_UPDATES = 0;
+delete from sidny_test_1014.statusReason;
+insert into sidny_test_1014.statusReason (select * from sidny.statusReason);
+
+
+update sidny_test_1014.statusReason set 
+  keyStatusReasonID = 143 
+where statusID 
+  in (SELECT statusID FROM sidny_test_1014.status 
+ where keyStatusID = 3 and program='yes' 
+    and statusDate > '2014-06-30') ;
+- 111 rows
+
+
+SELECT * FROM sidny_test_1014.status 
+ where keyStatusID = 3 and program='yes' 
+    and statusDate > '2014-06-30';
+- 112 rows
+
+
+
+
+12/09/14
+
+SELECT * FROM sidny_test_1014.status 
+ where keyStatusID = 14 and program='yes' 
+    and statusDate > '2014-06-30';
+26 rows of old yes+
+
+NO UPDATE for the corresponding EXIT as the students are not yet exited; NO exit reasons for these. 
+
+proof for this:
+
+select *  from sidny_test_1014.status where contactID in 
+( SELECT contactID FROM sidny_test_1014.status 
+ where statusDate = date_add(statusDate, INTERVAL 1.5 HOUR) 
+     and program='ytc' and keyStatusID=13 )
+   and program='yes' and keyStatusID=3;
+0 rows
+
+
+update sidny_test_1014.status set statusDate = date_add(statusDate, INTERVAL 1.5 HOUR) 
+     and program='ytc' and keyStatusID=13     
+     where (program ='yes' and statusDate > '2014-06-30' 
+          and keyStatusID = 14);
+26 rows
+
+
+update sidny_test_1014.status set statusDate = date_add(statusDate, INTERVAL 6 HOUR) 
+     ,  program='ytc'    
+     where program ='yes' and statusDate > '2014-06-30' 
+          and keyStatusID = 3;
+112 rows
+
+
+MAP - start:
+
+SELECT * FROM sidny_test_1014.status 
+ where keyStatusID = 2 and program='map' 
+    and statusDate > '2014-06-30';
+- 40 rows
+xx
+
+update sidny_test_1014.status set statusDate = date_add(statusDate, INTERVAL 1 HOUR) 
+     , keyStatusID = 15 and program='ytc'     
+     where (program ='map' and statusDate > '2014-06-30' 
+          and keyStatusID = 2 );
+- 40 rows
+xx
+
+SELECT * FROM sidny.status 
+ where keyStatusID = 6 and program='map' 
+    and statusDate > '2014-06-30';
+- 34 rows
+
+update sidny.status set statusDate = date_add(statusDate, INTERVAL 2 HOUR) 
+     ,  program='ytc'    
+     where (program ='map' and statusDate > '2014-06-30' 
+          and keyStatusID = 6);
+- 34 rows
+xx
+
+SELECT * FROM sidny.status 
+ where keyStatusID = 7 and program='map' 
+    and statusDate > '2014-06-30';
+- 34 rows
+
+update sidny.status set statusDate = date_add(statusDate, INTERVAL 4 HOUR) 
+     ,  program='ytc'    
+     where (program ='map' and statusDate > '2014-06-30' 
+          and keyStatusID = 7);
+- 34 rows
+
+SELECT * FROM sidny.statusReason where statusID 
+  in (SELECT statusID FROM sidny.status 
+ where keyStatusID = 3 and program='map' 
+    and statusDate > '2014-06-30') ;
+- 20 rows
+
+update sidny.statusReason set 
+  keyStatusReasonID = 145 
+where statusID 
+  in (SELECT statusID FROM sidny.status 
+ where keyStatusID = 3 and program='map' 
+    and statusDate > '2014-06-30') ;
+- 20 rows
+
+SELECT * FROM sidny.status 
+ where keyStatusID = 13 and program='map' 
+    and statusDate > '2014-06-30';
+// for map+
+- 10 rows
+
+update sidny.status set statusDate = date_add(statusDate, INTERVAL 1.5 HOUR) 
+     ,  program='ytc' ,  keyStatusID=14      
+     where (program ='map' and statusDate > '2014-06-30' 
+          and keyStatusID = 13);
+
+SELECT * FROM sidny.status 
+ where keyStatusID = 3 and program='map'  
+    and statusDate > '2014-06-30';
+- 21 rows
+
+update sidny.status set statusDate = date_add(statusDate, INTERVAL 6 HOUR) 
+     ,  program='ytc'    
+     where program ='map' and statusDate > '2014-06-30' 
+          and keyStatusID = 3;
+- 21 rows
+
+
+12/22/14
+
+
+The switch date should be July 1st, 2014.
+
+Any students who entered the YES on or after that date should be switched to YtC attendance 16
+Any students who entered the YES+ on or after that date should be switched to YtC credit 13
+Any students who entered the MAP on or after that date should be switched to YtC ELL attendance 15
+Any students who entered the MAP+ on or after that date should be switched to YtC ELL credit 14
+Students who were enrolled in one of the four programs through that date, should be switched with the original enrollment date.
+Nothing should change for students who left the programs before that date.
+
+old: 
+MAP+ 13
+YES+ 14
+
+
+
+12/22/14
+
+map 2 
+ - 46 rows
+
+map 6 39
+
+map 7 39 
+
+SELECT * FROM sidny.statusReason where statusID 
+  in (SELECT statusID FROM sidny_test_1014.status 
+ where keyStatusID = 3 and program='map' 
+    and statusDate > '2014-06-30') ;
+
+- 0 rows as compared to 20 rows on Test!!
+
+map+  13   11rows
+SELECT * FROM sidny.status 
+ where keyStatusID = 13 and program='map' 
+    and statusDate > '2014-06-30';
+
+map  3   24 rows
+12:26:50	update sidny.status set statusDate = date_add(statusDate, INTERVAL 6 HOUR)       and program='ytc'          where program ='map' and statusDate > '2014-06-30'            and keyStatusID = 3	24 row(s) affected Rows matched: 24  Changed: 24  Warnings: 0	0.016 sec
+
+
+yes 2 261
+
+yes 6 159
+
+yes 7 159
+
+SELECT * FROM sidny.statusReason where statusID 
+  in (SELECT statusID FROM sidny.status 
+ where keyStatusID = 3 and program='yes' 
+    and statusDate > '2014-06-30') ;
+
+
+- 154 rows
+
+yes+ 14 33 rows
+
+yes 3 155
+
+ 
+select *  from status_bk_122214 where statusDate rlike '0000'
+- 1 row for gtc returned
+
+//// finding////  12222014 2:00pm
+
+statusDate is truncated to 0000-00-00 while update is performed
+
+update sidny_test_1014.status set 
+  statusDate=date_add(statusDate, INTERVAL 1 HOUR) where 
+   statusID = 135463
+ 
+
+
+12/23/14
+
+
+//map
+//$sql_select_query = "SELECT * FROM sidny.status where keyStatusID = 2 and program='map' 
+//    and statusDate > '2014-06-30' ";
+
+//$sql_select_query = "SELECT * FROM sidny.status where keyStatusID = 6 and program='map' 
+//    and statusDate > '2014-06-30'";
+
+//$sql_select_query = "SELECT * FROM sidny.status where keyStatusID = 7 and program='map' 
+//    and statusDate > '2014-06-30'";
+
+//$sql_select_query = "SELECT * FROM sidny.statusReason where statusID 
+//  in (SELECT statusID FROM sidny.status where keyStatusID = 3 and program='map' 
+//    and statusDate > '2014-06-30') ";
+
+//$sql_select_query = "SELECT * FROM sidny.status where keyStatusID = 13 and program='map' 
+//    and statusDate > '2014-06-30'";
+
+//$sql_select_query  = "SELECT * FROM sidny.status  where keyStatusID = 3 and program='map'  
+    and statusDate > '2014-06-30'";
+
+
+
+//map
+//$sql = "update sidny.status set statusDate = date_add('$statusDate1', INTERVAL 1 HOUR), keyStatusID = 15, //program='ytc' where statusID = $statusID1";
+
+//$sql = "update sidny.status set statusDate = date_add('$statusDate1', INTERVAL 2 HOUR), program='ytc', 
+//   keyStatusID=6 where statusID = $statusID1";
+
+//$sql = "update sidny.status set statusDate = date_add(statusDate, INTERVAL 4 HOUR),  
+//      program='ytc',  keyStatusID=7 where statusID = $statusID1 ";
+
+//$sql = "update sidny.statusReason set keyStatusReasonID = 145 
+//       where statusID = $statusID1";
+
+//$sql = "update sidny.status set statusDate = date_add(statusDate, INTERVAL 1.5 HOUR), 
+//         program='ytc', keyStatusID=14 where statusID = $statusID1";
+
+//$sql = "update sidny.status set statusDate = date_add(statusDate, INTERVAL 6 HOUR),  
+//          program='ytc'   where  statusID = $statusID1";
+
+
+--------------------------
+
+12/29/14
+
+SELECT d.contactID, d.statusID, d.max_timestamp, d.program, d.keyStatusID  
+      FROM 
+       (SELECT a.contactID, a.statusID, a.keyStatusID, a.program, 
+         a.undoneStatusID, a.statusRecordLast, a.statusDate as max_timestamp 
+          FROM status a 
+            JOIN status b 
+             on a.statusID=b.statusID 
+             WHERE b.statusID in 
+                 ( SELECT substring_index(dd.maxDateString, ':', -1) as statusID_val FROM  
+                   ( SELECT max(concat(f.statusDate, ':',f.keyStatusID, ':', f.statusID)) as maxDateString,  
+                      f.undoneStatusID, f.program FROM status f 
+                        WHERE f.keyStatusID in (2,6,7) AND f.statusDate <= '2014-12-29'    
+                          AND (f.undoneStatusID IS NULL) AND f.program= 'yes'   
+                       GROUP BY f.program, f.contactID        
+                    ) dd 
+                ) AND b.keyStatusID IN (2,3,6,7) 
+    ) d
+
+
+SELECT d.contactID, d.statusID, d.max_timestamp, d.program, d.keyStatusID  
+      FROM 
+       (SELECT a.contactID, a.statusID, a.keyStatusID, a.program, 
+         a.undoneStatusID, a.statusRecordLast, a.statusDate as max_timestamp 
+          FROM status a 
+            JOIN status b 
+             on a.statusID=b.statusID 
+             WHERE b.statusID in 
+                 ( SELECT substring_index(dd.maxDateString, ':', -1) as statusID_val FROM  
+                   ( SELECT max(concat(f.statusDate, ':',f.keyStatusID, ':', f.statusID)) as maxDateString,  
+                      f.undoneStatusID, f.program FROM status f 
+                        WHERE f.keyStatusID in (2,3,6,7,10,14) AND f.statusDate <= '2014-12-29'    
+                          AND (f.undoneStatusID IS NULL) AND f.program= 'yes'   
+                       GROUP BY f.program, f.contactID        
+                    ) dd 
+                ) AND b.keyStatusID IN (2,6,7,10,14) and b.program='yes'
+    ) d
+- correct - 148 rows including yes+
+
+12/31/14
+
+check the above query results and look for statuses for contactID = 12907!!!!
+
+
+----------------------------
+
+01/05/15
+
+For Nick Scheer (Tracie's student)
+
+1. YtC enrolled was at the same date as yes enrolled and no timestamp change exists in DB and so, the latest ytc entry did not show up in the status list
+2. Even after (1) was fixed by including an hour in the statusDate timestamp, YtC tab did not get enabled. 
+3. May be a corresponding ytc table entry does not get created when ytc enrolled is created?!
+
+
+
+select distinct contactID  from status 
+  where program='ytc' and 
+  contactID not in (select contactID from ytc )
+
+01/06/15
+
+* Changed mapID to ytcID and the map start/end date columns to ytc date columns
+* new YtC enrolled statuses -> add new row in ytc table
+* new YtC credit, etc statuses -> do not add a new row in ytc table!! check!!!!
+
+* common/addedit.php changed to include stauses 13,14,15,16 in "insert" for new records in ytc table when any of the new four statuses are chosen
+
+
+******* Going through every file and checking the code for any glitches relating to YtC statuses *********
+
+01/07/15
+files changed: (after the release)
+addedit.php
+map_application.php
+map_ged.php
+map_plan.php
+ - fixed the code for ytc replacing map table references
+
+files - may need to be modified:
+change_RS.php - if in use currently
+batchArrays.php
+admin_batches.php, ...
+admin_dbQuery.php
+
+
+01/08/15
+
+SELECT d.contactID, d.statusID, d.max_timestamp, d.program, d.keyStatusID  
+      FROM 
+       (SELECT a.contactID, a.statusID, a.keyStatusID, a.program, 
+         a.undoneStatusID, a.statusRecordLast, a.statusDate as max_timestamp 
+          FROM status a 
+            JOIN status b 
+             on a.statusID=b.statusID 
+             WHERE b.statusID in 
+                 ( SELECT substring_index(dd.maxDateString, ':', -1) as statusID_val FROM  
+                   ( SELECT max(concat(f.statusDate, ':',f.keyStatusID, ':', f.statusID)) as maxDateString,  
+                      f.undoneStatusID, f.program FROM status f 
+                        WHERE f.keyStatusID in (2,3,6,7,10,13)     
+                          AND (f.undoneStatusID IS NULL) AND f.program= 'map'   
+                       GROUP BY f.program, f.contactID        
+                    ) dd 
+                ) AND b.keyStatusID IN (2,6,7,10,13) and b.program='map' 
+    and a.program='map') d
+
+
+------------------------------
+
+Correct YtC to map before 6/30/14
+correct YtC to Ytc credit for after 6/30/14
+
+and THEN deal with map. 
+
+-------------------------------------
+
+20036, 20473, 20493,  20496, 20497,   
+   20501, 20502, 20504 - new rows not in ytc table
+
+-------------------------------------
+
+01/14/15
+
+data - need to be corrected for:
+contactID:
+(ytc - set this back to yes exit and then enroll in ytc)
+ 7987
+----------------------------
+
+10/27/15
+
+
+insert into sidny.keyStatusReason columns (statusID, reasonNum, 
+  reasonText, reasonArea, ppsRequired, orderNumber) values 
+(3, 64, 'Attended/Exited before Deadline', 'exitStatus', 0, 630);
+
+SET SQL_SAFE_UPDATES=0;
+update sidny.keyStatusReason set keyStatusReasonID=147 where statusID=3 
+  and  reasonNum = 64
+
+update sidny.keyStatusReason set reasonText='Accepted/No Show' 
+ where statusID=3 and keyStatusReasonID=138;

@@ -1,0 +1,12 @@
+Steps: 
+ 1. Export the current table (bannerCourses) and save it as sql file.
+ 2. Create a table named bannerCourses_until_date and import the saved sql file back into this table.
+ 2. delete the current table (bannerCourses)
+ 3. clean up the new excel data file (sent by Mahmoud) for any commas, or single 
+     quotes; Save as CSV file. 
+ 4. using load in file command, import the new data set into 
+     the empty table. 
+ 5. Verify the data looks correct. 
+ 6. If the difference in the number of rows between the older 
+     and newer data set is significant, contact Mahmoud and 
+     verify that the data set is correct. 

@@ -1,0 +1,10 @@
+<?php
+
+//dataconnection
+
+$connection = mysqli_connect("pcclampdev.pcc.edu:3307","sparamasivam","halfsquidcactusscrollplumpknitclose", "sidny") or die("Could not connect to server!");
+
+//$database = 'rhonda2.3';
+;$database = 'sidny';
+;$selectDB = mysql_select_db($database, $connection) ;
+?>

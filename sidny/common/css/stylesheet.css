@@ -1,0 +1,332 @@
+
+/*
+ General Stylesheet
+*/
+body{
+       /*background-color:#64A545;
+       background-color:#86D363;
+       background-image:url('../../common/images/pattern_158.gif');
+       background-image:url('../../common/images/pattern_156.gif');
+       background-image:url('../../common/images/PCClogoBG.png');*/
+       background-image:url('../../common/images/pcc-logo-wave_bkg.png');
+       background-color:#BED0DD;
+       font-size: 10pt;
+       font-family: 'Abel', sans-serif;
+}
+.container{
+    -moz-border-radius: 6px 6px 6px 6px;
+    -moz-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.25);
+    background-color: #FFFFFF;
+    margin: -40px auto ;
+    padding:5px;
+   width: 900px;  
+}
+ 
+.checkbox_col{
+       float: left;
+       margin-right: 5px;
+       width: 400px;
+ }
+.exitReasonList{
+       border-left:thin solid #888888;
+ }
+ .clear{
+      clear: both; 
+ }
+ .contact_left{
+       float: left;
+       margin-right: 15px;
+       width: 400px;
+}
+ .header_left{
+       float: left;
+       margin-left: 0px;
+       margin-right: 15px;
+       margin-bottom: 5px;
+       width: 300px;
+}
+ .header_right{
+       float: left;
+       margin-top: 5px;
+       margin-right: 0px;
+       margin-bottom: 5px;
+       width: 580px;
+}
+
+#studentInformation{
+       float: left;
+       margin-left: 0px;
+       margin-right: 15px;
+       margin-bottom: 5px;
+       width: 300px;
+}
+#commentList{
+       float: left;
+       margin-top: 0px;
+       margin-right: 0px;
+       margin-bottom: 5px;
+       width: 580px;
+}
+#commentGroup{
+       margin-top: 0px;
+       overflow:auto;
+       height:125px;
+}
+#commentBoarder{
+       height:135px;
+}
+.transition{
+       width: 150px;
+}
+label.search { display: inline-block; width: 90px }
+
+#navlist li
+{
+display: inline;
+list-style-type: none;
+padding-right: 20px;
+font-size: 10pt
+}
+
+#navigation{
+       float: right;
+       display: inline;
+}
+a.nav{
+	text-decoration: none;
+	color:#666666;
+}
+a.nav:visited{
+	text-decoration: none;
+	color:#666666;
+}
+
+a.nav:hover{
+	text-decoration: underline;
+	color:#666666;
+}
+/*SEARCH*/
+a:focus {
+outline: none;
+}
+a.trigger{
+	background:#fff url(../../common/images/searchtool_24.png) 6% 55% no-repeat;
+	text-decoration: none;
+	font-size: 16px;
+	letter-spacing:-1px;
+	font-family: verdana, helvetica, arial, sans-serif;
+	color:#999999;
+	padding:4px 12px 6px 28px;
+        font-weight:bold;
+        z-index:2;
+}
+
+
+a.trigger:hover {
+	color:#59B;
+}
+a.active.trigger {
+	background:#000 url(../../common/images/minus.png) 6% 55% no-repeat;
+	color:#CCC;
+	border-top-right-radius: 15px;
+	-moz-border-radius-topright: 15px;
+	-webkit-border-top-right-radius: 15px;
+	border-top-left-radius: 15px;
+	-moz-border-radius-topleft: 15px;
+	-webkit-border-top-left-radius: 15px;
+        opacity:0.9;
+        filter:alpha(opacity=90);
+}
+.panel {
+	color:#CCC;
+	position: absolute;
+	display: none;
+	background: #000000;
+	width: 300px;
+	height: auto;
+	z-index:1;
+}
+.panel.left {
+	left: 0;
+	padding: 20px 30px 20px 100px;
+	border-top-right-radius: 15px;
+	-moz-border-radius-topright: 15px;
+	-webkit-border-top-right-radius: 15px;
+	-moz-border-radius-bottomright: 15px;
+	-webkit-border-bottom-right-radius: 15px;
+	border-bottom-right-radius: 15px;
+}
+.panel.right {
+	right: 0;
+	padding: 20px 100px 20px 30px;
+	border-bottom-left-radius: 15px;
+	border-top-left-radius: 15px;
+	-moz-border-radius-bottomleft: 15px;
+	-moz-border-radius-topleft: 15px;
+	-webkit-border-bottom-left-radius: 15px;
+	-webkit-border-top-left-radius: 15px;
+}
+.panel p {
+	font-size:11px;
+}
+
+table.searchList {
+       border-spacing: 0px;
+      
+    -moz-border-radius: 4px; 
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    /*border: 1px solid #79b7e7; 
+    border: 1px solid #C45F53; */
+    border: 1px solid #A6C9E2; 
+       
+}
+.searchList th{
+       background-color: #E6EEEE;
+       font-weight: bold;
+}
+.searchList td, th{
+       padding: 5px 10px;
+       border-bottom:1px solid #999999;
+}
+.searchList a{
+  font-weight: bold;
+}
+
+.commentDisplay{
+       border-bottom:thin dashed #888888;
+       padding:4px;
+}
+table.caseList {
+       border-spacing: 0px;
+      
+    -moz-border-radius: 4px; 
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    /*border: 1px solid #79b7e7; 
+    border: 1px solid #C45F53; */
+    border: 1px solid #A6C9E2; 
+       
+}
+.caseList th{
+       background-color: #E6EEEE;
+       font-weight: bold;
+}
+.caseList td, th{
+       padding: 5px 10px;
+       border-bottom:1px solid #999999;
+}
+#commentButton{
+       font-size: 7pt;
+       border-bottom:thin dashed #888888;
+       padding-top: 10px;
+       padding-bottom: 15px;
+}
+#statusButton{
+       font-size: 8pt;
+       border-bottom:thin dashed #888888;
+       padding-bottom: 5px;
+       margin-bottom: 10px;
+}
+#classButton{
+       font-size: 8pt;
+       padding-bottom: 5px;
+       margin-bottom: 10px;
+}
+#elpaButton{
+       font-size: 8pt;
+       padding-bottom: 5px;
+       margin-bottom: 10px;
+}
+.edit{
+       font-size: 6pt;
+       margin-left: 15px;
+       color: #A94D53;
+       float: right;
+}
+#newComment{
+    padding: 1px 1px 1px 1px; /* Or whatever makes it small enough. */
+    margin: 1px 1px 1px 1px; /* Or whatever makes it small enough. */
+}
+.stuInfo{
+       float:right;
+}
+.stuName{
+       /*color: #A94D53; */
+       color: #A05054;
+       font-size: 18px;
+}
+#classList{
+       width: 800px;
+       overflow:auto;
+}
+#reportData{
+       margin-left: 10px;
+       width: 870px;
+       max-height: 400px;
+       overflow:auto;
+}
+#uploadOutput{
+       margin-left: 10px;
+       width: 870px;
+       max-height: 400px;
+       height:auto !important;
+       height:400px;
+       overflow:auto;
+}
+.reportData2{
+       margin-bottom: 10px;
+       width: 870px;
+       max-height: 400px;
+       overflow:auto;
+}
+#loadingScreen {
+	background: url(../images/loading.gif) no-repeat 5px 8px;
+	padding-left: 25px;
+}
+fieldset { 
+    -moz-border-radius: 4px; 
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    /*border: 1px solid #79b7e7; 
+    border: 1px solid #C45F53; */
+    border: 1px solid #A6C9E2;
+}
+
+/*
+ LEADER DOTS
+http://www.w3.org/Style/Examples/007/leaders.en.html
+
+Dots are the most common, but you can use other symbols, such as dashes, or a solid line with an arrow. They help to visually connect items across a gap of variable size.
+
+CSS should soon acquire real leaders, which can be added after or before an element to bridge the gap to the next element. But let's look at a trick to simulate them with CSS level 2.
+
+The method below isn't the first or the only attempt to trick CSS into displaying leaders. The first is due to Tantek Çelik. His Bella Mia menu was made, you guessed it, during dinner in a restaurant called Bella Mia, as long ago as 2000. Some other examples are by Micah Sittig and Brett Merkey. 
+*/
+ul.leaders {
+    max-width: 290px;
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+    list-style: none}
+ul.leaders li:before {
+    float: left;
+    width: 0;
+    white-space: nowrap;
+    content:
+ ". . . . . . . . . . . . . . . . . . . . "
+ ". . . . . . . . . . . . . . . . . . . . "
+ ". . . . . . . . . . . . . . . . . . . . "
+ ". . . . . . . . . . . . . . . . . . . . "}
+ul.leaders span:first-child {
+    padding-right: 0.33em;
+    background: white}
+ul.leaders span + span {
+    float: right;
+    padding-left: 0.33em;
+    background: white}
+    
+th.headerSortUp span {
+    background: url("arrow-up.gif") right center no-repeat;
+    padding-right: 15px;
+}

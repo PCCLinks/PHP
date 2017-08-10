@@ -1,0 +1,44 @@
+    <fieldset class='group4'>
+        <legend>GED Test Scores (Since 2014) </legend> 
+<table id='gedTestScores' class='tablesorter'>
+    <tbody>
+	<tr>
+            <th>Language Arts</th>
+            <td>Score:<input type='text' name='gedMapLanguageArtsScore' id='gedMapLanguageArtsScore' class='textInput' tabindex='4' value='<?php echo $gedMapLanguageArtsScore ?>' onchange="validateMapGed(this.form.id,this.name,this.value,'MAP', 0)"/></td>
+            <td>Date:<input type='text' name='gedMapLanguageArtsDate' id='gedMapLanguageArtsDate' class='textInput' tabindex='5' value='<?php echo $gedMapLanguageArtsDate ?>' onchange="validateMapGed(this.form.id,this.name,this.value,'MAP', 0)"/></td>
+            <td>Attempt:
+	    <select name='gedMapLanguageArtsAttemptNum' id='gedMapLanguageArtsAttemptNum' class='textInput' tabindex='6' value='<?php echo $gedMapLanguageArtsAttemptNum ?>' onchange="validateMAP(this.form.id,this.name,this[this.selectedIndex].value, 'MAP', 0)">";
+	    <?php echo attemptGED($gedMapLanguageArtsAttemptNum, 5) ;?>
+	    </td>
+	</tr>
+	<tr>
+            <th>Soc Studies</th>
+            <td>Score:<input type='text' name='gedMapSocStudiesScore' id='gedMapSocStudiesScore' class='textInput' tabindex='7' value='<?php echo $gedMapSocStudiesScore ?>' onchange="validateMapGed(this.form.id,this.name,this.value,'MAP', 0)"/></td>
+            <td>Date:<input type='text' name='gedMapSocStudiesDate' id='gedMapSocStudiesDate' class='textInput' tabindex='8' value='<?php echo $gedMapSocStudiesDate ?>' onchange="validateMapGed(this.form.id,this.name,this.value,'MAP', 0)"/></td>
+            <td>Attempt:
+	    <select name='gedMapSocStudiesAttemptNum' id='gedMapSocStudiesAttemptNum' class='textInput' tabindex='9' value='<?php echo $gedMapSocStudiesAttemptNum ?>' onchange="validateMapGed(this.form.id,this.name,this[this.selectedIndex].value, 'MAP', 0)">";
+	    <?php echo attemptGED($gedMapSocStudiesAttemptNum, 5) ;?>
+	    </td>
+	</tr>
+	<tr>
+            <th>Science</th>
+            <td>Score:<input type='text' name='gedMapScienceScore' id='gedMapScienceScore' class='textInput' tabindex='10' value='<?php echo $gedMapScienceScore ?>' onchange="validateMapGed(this.form.id,this.name,this.value,'MAP', 0)"/></td>
+            <td>Date:<input type='text' name='gedMapScienceDate' id='gedMapScienceDate' class='textInput' tabindex='11' value='<?php echo $gedMapScienceDate ?>' onchange="validateMapGed(this.form.id,this.name,this.value,'MAP', 0)"/></td>
+            <td>Attempt:
+	    <select name='gedMapScienceAttemptNum' id='gedMapScienceAttemptNum' class='textInput' tabindex='12' value='<?php echo $gedMapScienceAttemptNum ?>' onchange="validateMapGed(this.form.id,this.name,this[this.selectedIndex].value, 'MAP', 0)">";
+	    <?php echo attemptGED($gedMapScienceAttemptNum, 5) ;?>
+	    </td>
+        </tr>
+	 <tr>
+            <th>Math</th>
+            <td>Score:<input type='text' name='gedMapMathScore' id='gedMapMathScore' class='textInput' tabindex='13' value='<?php echo $gedMapMathScore ?>' onchange="validateMapGed(this.form.id,this.name,this.value,'MAP', 0)"/></td>
+            <td>Date:<input type='text' name='gedMapMathDate' id='gedMapMathDate' class='textInput' tabindex='14' value='<?php echo $gedMapMathDate ?>' onchange="validateMapGed(this.form.id,this.name,this.value,'MAP', 0)"/></td>
+            <td>Attempt:
+	    <select name='gedMapMathAttemptNum' id='gedMapMathAttemptNum' class='textInput' tabindex='15' value='<?php echo $gedMapMathAttemptNum ?>' onchange="validateMapGed(this.form.id,this.name,this[this.selectedIndex].value, 'MAP', 0)">";
+	    <?php echo attemptGED($gedMapMathAttemptNum, 5) ;?>
+	    </td>
+	</tr>
+    </tbody>
+   </table>
+
+    </fieldset> 
