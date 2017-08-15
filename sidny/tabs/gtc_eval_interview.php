@@ -2,22 +2,22 @@
 session_start();
 //Session Check
 if (!isset($_SESSION['PCCPassKey'])) {
-    header("Location:http://184.154.67.171/index.php?error=3");
-    exit();
+	header("Location:http://184.154.67.171/index.php?error=3");
+	exit();
 }elseif(isset($_SESSION['PCCPassKey']) && $_SESSION['PCCPassKey'] != $_SESSION['userID'].$_SESSION['adminLevel'].$_SESSION['userLastName']) {
-    header("Location:http://184.154.67.171/index.php?error=3");
-    exit();
+	header("Location:http://184.154.67.171/index.php?error=3");
+	exit();
 }
 
 ################################################################################################################
 //Capture variables
 $contactID = $_SESSION['contactID'];
 ################################################################################################################
-    // connect to a Database
-    include ("../common/dataconnection.php"); 
+// connect to a Database
+include ("../common/dataconnection.php");
 ################################################################################################################
-    // include functions
-    include ("../common/functions.php");
+// include functions
+include ("../common/functions.php");
 
 ################################################################################################################
 //Session Check
@@ -27,17 +27,17 @@ $contactID = $_SESSION['contactID'];
 //}
 ################################################################################################################
 //Application Data
-    $SQLgtc = "SELECT * FROM gtc  WHERE contactID ='". $_SESSION['contactID']."'" ;
-    $result = mysql_query($SQLgtc,  $connection) or die($SQLgtc."There were problems connecting to the contact data.  If you continue to have problems please contact us.<br/>");
-    $num_of_rows = mysql_num_rows ($result);
-    if (0 != $num_of_rows){
+$SQLgtc = "SELECT * FROM gtc  WHERE contactID ='". $_SESSION['contactID']."'" ;
+$result = mysql_query($SQLgtc,  $connection) or die($SQLgtc."There were problems connecting to the contact data.  If you continue to have problems please contact us.<br/>");
+$num_of_rows = mysql_num_rows ($result);
+if (0 != $num_of_rows){
 	//set the variable name as the database field name.
 	while($row = mysql_fetch_assoc($result)){
 		foreach($row as $k=>$v){
-	 	   $$k=$v;
+			$$k=$v;
 		}
-    	}
-    }
+	}
+}
 
 ################################################################################################################
 $gtcWritingAverage='';
@@ -45,6 +45,37 @@ if($evalEssayScore >0 && $evalGrammarScore >0) $gtcWritingAverage = number_forma
 
 if($evalReadingScore >0 && $evalMathScore >0 && $gtcWritingAverage != '') $gtcAverageScore = number_format(($evalReadingScore + $evalMathScore + $gtcWritingAverage)/3) ;
 ################################################################################################################
+
+
+##################################################################################################################
+//Lookup values for Career Industry
+$careerIndustryArray = array(
+		'Accommodation and Food Services'
+		,'Computer/Information Technology services'
+		,'Construction'
+		,'Design Services'
+		,'Educational Services (i.e. teachers)'
+		,'Engineering'
+		,'Entertainment'
+		,'Finance', 'Insurance'
+		,'Health Care'
+		,'Information (i.e. telecommun. & book publishing)'
+		,'Law'
+		,'Management of Companies and Enterprises'
+		,'Manufacturing'
+		,'Marketing'
+		,'Other'
+		,'Public Administration (i.e. government)'
+		,'Real Estate Rental & Leasing'
+		,'Recreation'
+		,'Retail Sales (i.e. retail associate)'
+		,'Science'
+		,'Social Services (i.e. counselors and case managers)'
+		,'Transportation & Warehsing (i.e. truck driving & rail)');
+##################################################################################################################
+
+
+
 ?>
 <script type="text/javascript">
 	//$(document).ajaxError(function(e, xhr, settings, exception) {
@@ -115,14 +146,15 @@ if($evalReadingScore >0 && $evalMathScore >0 && $gtcWritingAverage != '') $gtcAv
 	});
     };
 </script>
-    <form id='fInterview' class="cmxform" action='common/addedit.php' method='post'>
+
+<form id='fInterview' class="cmxform" action='common/addedit.php' method='post' style="height:375px;">
 	<input type='hidden' name='contactID' id='contactID' value='<?php echo $_SESSION['contactID']?>'>
 	<input type='hidden' name='gtcID' id='gtcID' value='<?php echo $gtcID ?>'>
 	<div class='contact_left'>  
-    <fieldset class='group'>
-       <legend>Evaluation Session</legend>
+    	<fieldset class='group'>
+       	<legend>Evaluation Session</legend>
 	    <ol class='dataform'>
-		    <li>
+			<li>
 			    <label for='eval1Date'>Day 1 Evaluation Date </label>
 			    <input type='text' name='eval1Date' id='eval1Date' class='textInput' tabindex='1' value='<?php echo $eval1Date ?>' onchange="validateInterview(this.form.id,this.name,this.value, 'gtc', 1)"/>
 		    </li>
@@ -132,11 +164,10 @@ if($evalReadingScore >0 && $evalMathScore >0 && $gtcWritingAverage != '') $gtcAv
 		    </li>  
 	    </ol>
 	    </fieldset>
-
 	    <fieldset class='group'>
-       <legend>Interview</legend>
-	<ol class='dataform'>
-		    <li>
+       	<legend>Interview</legend>
+		<ol class='dataform'>
+			<li>
 			    <label for='interviewCompleted'>If Interview completed? </label>
 			    <select name='interviewCompleted' id='interviewCompleted' tabindex='3' onchange="validateInterview(this.form.id,this.name,this[this.selectedIndex].value,'gtc', 0)">
 				<option value=''>
@@ -148,42 +179,31 @@ if($evalReadingScore >0 && $evalMathScore >0 && $gtcWritingAverage != '') $gtcAv
 			    <label for='interviewDate'>Interview Date </label>
 			    <input type='text' name='interviewDate' id='interviewDate' class='textInput' tabindex='4' value='<?php echo $interviewDate ?>' onchange="validateInterview(this.form.id,this.name,this.value, 'gtc', 1)"/>
 		    </li>
-		  <li>
+		  	<li>
 			    <label for='interviewScore'>Score (%)</label>
 			    <input type='text' name='interviewScore' id='interviewScore' class='textInput' tabindex='5' value='<?php echo $interviewScore ?>' onchange="validateInterview(this.form.id,this.name,this.value, 'gtc', 1)"/>
 		    </li>
 	   </ol>
     </fieldset>
-        <fieldset class='group'>
+    <fieldset class='group'>
     <legend>Careers</legend>
 	<ol class='dataform'>
 		    <li>
 			    <label for='careerIndustry'>Career Industry</label>
 			    <select name='careerIndustry' id='careerIndustry' tabindex='3' onchange="validateInterview(this.form.id,this.name,this[this.selectedIndex].value,'gtc', 0)">
 				<option value=''>
-				<option<?php if($careerIndustry== 'Construction') echo ' selected'; ?> value='<?php echo urlencode("Construction");?>'>Construction
-				<option<?php if($careerIndustry== 'Manufacturing') echo ' selected'; ?>  value='<?php echo urlencode("Manufacturing");?>'>Manufacturing
-				<option<?php if($careerIndustry== 'Retail Sales (i.e. retail associate)') echo ' selected'; ?>  value='<?php echo urlencode("Retail Sales (i.e. retail associate)");?>'>Retail Sales (i.e. retail associate)
-				<option<?php if($careerIndustry== 'Transportation & Warehousing (i.e. truck driving & rail)') echo ' selected'; ?> value='<?php echo urlencode("Transportation & Warehousing (i.e. truck driving & rail)");?>' >Transportation & Warehousing (i.e. truck driving & rail)
-				<option<?php if($careerIndustry== 'Information (i.e. telecommunications & book publishing)') echo ' selected'; ?>  value='<?php echo urlencode("Information (i.e. telecommunications & book publishing)");?>'>Information (i.e. telecommunications & book publishing)
-				<option<?php if($careerIndustry== 'Finance') echo ' selected'; ?>  value='<?php echo urlencode("Finance");?>'>Finance
-				<option<?php if($careerIndustry== 'Insurance') echo ' selected'; ?>  value='<?php echo urlencode("Insurance");?>'>Insurance
-				<option<?php if($careerIndustry== 'Real Estate Rental & Leasing') echo ' selected'; ?>  value='<?php echo urlencode("Real Estate Rental & Leasing");?>'>Real Estate Rental & Leasing
-				<option<?php if($careerIndustry== 'Law') echo ' selected'; ?>  value='<?php echo urlencode("Law");?>'>Law
-				<option<?php if($careerIndustry== 'Engineering') echo ' selected'; ?>  value='<?php echo urlencode("Engineering");?>'>Engineering
-				<option<?php if($careerIndustry== 'Design Services') echo ' selected'; ?>  value='<?php echo urlencode("Design Services");?>'>Design Services
-				<option<?php if($careerIndustry== 'Marketing') echo ' selected'; ?>  value='<?php echo urlencode("Marketing");?>'>Marketing
-				<option<?php if($careerIndustry== 'Computer/Information Technology services') echo ' selected'; ?>  value='<?php echo urlencode("Computer/Information Technology services");?>'>Computer/Information Technology services
-				<option<?php if($careerIndustry== 'Science') echo ' selected'; ?>  value='<?php echo urlencode("Science");?>'>Science
-						<option<?php if($careerIndustry== 'Management of Companies and Enterprises') echo ' selected'; ?>  value='<?php echo urlencode("Management of Companies and Enterprises");?>'>Management of Companies and Enterprises
-				<option<?php if($careerIndustry== 'Educational Services (i.e. teachers)') echo ' selected'; ?>  value='<?php echo urlencode("Educational Services (i.e. teachers)");?>'>Educational Services (i.e. teachers)
-				<option<?php if($careerIndustry== 'Health Care') echo ' selected'; ?>  value='<?php echo urlencode("Health Care");?>'>Health Care
-				<option<?php if($careerIndustry== 'Social Services (i.e. counselors and case managers)') echo ' selected'; ?>  value='<?php echo urlencode("Social Services (i.e. counselors and case managers)");?>'>Social Services (i.e. counselors and case managers)
-				<option<?php if($careerIndustry== 'Entertainment') echo ' selected'; ?>  value='<?php echo urlencode("Entertainment");?>'>Entertainment
-				<option<?php if($careerIndustry== 'Recreation') echo ' selected'; ?>  value='<?php echo urlencode("Recreation");?>'>Recreation
-				<option<?php if($careerIndustry== 'Accommodation and Food Services') echo ' selected'; ?>  value='<?php echo urlencode("Accommodation and Food Services");?>'>Accommodation and Food Services
-				<option<?php if($careerIndustry== 'Public Administration (i.e. government)') echo ' selected'; ?>  value='<?php echo urlencode("Public Administration (i.e. government)");?>'>Public Administration (i.e. government)
-				<option<?php if($careerIndustry== 'Other') echo ' selected'; ?>  value='<?php echo urlencode("Other");?>'>Other
+				<?php
+				for($x = 0; $x < count($careerIndustryArray); $x++) {
+						echo "<option";
+						if($careerIndustry == $careerIndustryArray[$x]) {
+							echo ' selected';
+						}
+						echo " value= '";
+						echo urlencode($careerIndustryArray[$x]);
+						echo "' >";
+						echo $careerIndustryArray[$x];
+					}
+				?>
 			    </select>
 		    </li>
 		  <li>
