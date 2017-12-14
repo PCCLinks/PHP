@@ -47,34 +47,6 @@ if($evalReadingScore >0 && $evalMathScore >0 && $gtcWritingAverage != '') $gtcAv
 ################################################################################################################
 
 
-##################################################################################################################
-//Lookup values for Career Industry
-$careerIndustryArray = array(
-		'Accommodation and Food Services'
-		,'Computer/Information Technology services'
-		,'Construction'
-		,'Design Services'
-		,'Educational Services (i.e. teachers)'
-		,'Engineering'
-		,'Entertainment'
-		,'Finance', 'Insurance'
-		,'Health Care'
-		,'Information (i.e. telecommun. & book publishing)'
-		,'Law'
-		,'Management of Companies and Enterprises'
-		,'Manufacturing'
-		,'Marketing'
-		,'Other'
-		,'Public Administration (i.e. government)'
-		,'Real Estate Rental & Leasing'
-		,'Recreation'
-		,'Retail Sales (i.e. retail associate)'
-		,'Science'
-		,'Social Services (i.e. counselors and case managers)'
-		,'Transportation & Warehsing (i.e. truck driving & rail)');
-##################################################################################################################
-
-
 
 ?>
 <script type="text/javascript">
@@ -147,7 +119,7 @@ $careerIndustryArray = array(
     };
 </script>
 
-<form id='fInterview' class="cmxform" action='common/addedit.php' method='post' style="height:375px;">
+<form id='fInterview' class="cmxform" action='common/addedit.php' method='post' >
 	<input type='hidden' name='contactID' id='contactID' value='<?php echo $_SESSION['contactID']?>'>
 	<input type='hidden' name='gtcID' id='gtcID' value='<?php echo $gtcID ?>'>
 	<div class='contact_left'>  
@@ -185,33 +157,7 @@ $careerIndustryArray = array(
 		    </li>
 	   </ol>
     </fieldset>
-    <fieldset class='group'>
-    <legend>Careers</legend>
-	<ol class='dataform'>
-		    <li>
-			    <label for='careerIndustry'>Career Industry</label>
-			    <select name='careerIndustry' id='careerIndustry' tabindex='3' onchange="validateInterview(this.form.id,this.name,this[this.selectedIndex].value,'gtc', 0)">
-				<option value=''>
-				<?php
-				for($x = 0; $x < count($careerIndustryArray); $x++) {
-						echo "<option";
-						if($careerIndustry == $careerIndustryArray[$x]) {
-							echo ' selected';
-						}
-						echo " value= '";
-						echo urlencode($careerIndustryArray[$x]);
-						echo "' >";
-						echo $careerIndustryArray[$x];
-					}
-				?>
-			    </select>
-		    </li>
-		  <li>
-			    <label for=careerOccupation>Career Occupation</label>
-			    <input type='text' name='careerOccupation' id='careerOccupation' class='textInput' tabindex='5' value='<?php echo $careerOccupation?>' onchange="validateInterview(this.form.id,this.name,this.value, 'gtc', 1)"/>
-		    </li>
-	</ol>
-    </fieldset>
+ 
 	    </div>
 	    <fieldset class='group'>
        <legend>Evaluation Test Results </legend>

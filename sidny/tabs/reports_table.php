@@ -172,23 +172,23 @@ if($searchReport == 'applicant'){
 switch($searchReport){
     case 'applicant':
 	$reportNameDisplay = "Applicants";
-        if($searchProgram =='gtc'){
+//        if($searchProgram =='gtc'){
 //            $ids = $idsStatusApplicant;
-            $searchExtraFields = ", gtc.interviewScore, gtc.evalReadingScore, gtc.evalHomework, gtc.evalEssayScore, gtc.evalMathScore, gtc.evalGrammarScore, gtc.apiRawScore, gtc.apiGrade, contact.hsCreditsEntry, contact.hsGpaEntry";
+//            $searchExtraFields = ", gtc.interviewScore, gtc.evalReadingScore, gtc.evalHomework, gtc.evalEssayScore, gtc.evalMathScore, gtc.evalGrammarScore, gtc.apiRawScore, gtc.apiGrade, contact.hsCreditsEntry, contact.hsGpaEntry";
             $runQueryEnrolled = 0;
             $runQueryExited = 0;
-            $runQueryApplicant = 1;
+            $runQueryApplicant = 0;
             $runQueryStopped = 0;
             $runQueryRS = 0;
-            $runQuerySD = 1;
-            $runQueryReason = 1;
-            $runQueryReasonSecondary =1;
-            $arrHideCols = array(1,5,8,9);
-        }else{
-            $errorMsg = "You must select GTC for an Applicant report.";
-            $runQuery = 0;
-        }
-       $addJoin = " RIGHT JOIN tmpReportApplicant ON tmpReportApplicant.contactID = contact.contactID";
+            $runQuerySD = 0;
+            $runQueryReason = 0;
+            $runQueryReasonSecondary =0;
+ //           $arrHideCols = array(1,5,8,9);
+ //       }else{
+ //           $errorMsg = "You must select GTC for an Applicant report.";
+ //           $runQuery = 0;
+ //       }
+//       $addJoin = " RIGHT JOIN tmpReportApplicant ON tmpReportApplicant.contactID = contact.contactID";
     break;
 
     case 'enrollment':
@@ -387,6 +387,66 @@ if(!empty($errorMsg)){
     $tableRow = "<td>".$errorMsg."</td>";
 }else{
     switch($searchReport){
+    	case 'activeDuring':
+    	case 'enrolledDuring':
+    	case 'exitDuring':
+    	case 'gtcapplicant':
+    		$storedProc = "";
+    		$sql = "";
+    		switch($searchReport){
+    			case 'activeDuring':
+    				$reportNameDisplay = "Active During";
+    				$storedProc= "call spPopulateTmpReportActiveDuring('".$searchStartDate."','".$searchEndDate."','".$searchProgram."',".$searchSchoolDistrictID.")";
+    				$sql = "select * from tmpReportActiveDuring";
+    				break;
+    			case 'enrolledDuring':
+    				$reportNameDisplay = "Enrolled During";
+    				$storedProc= "call spPopulateTmpReportEnrolledDuring('".$searchStartDate."','".$searchEndDate."','".$searchProgram."',".$searchSchoolDistrictID.")";
+    				$sql = "select * from tmpReportEnrolledDuring";
+    				break;
+    			case 'exitDuring':
+    				$reportNameDisplay = "Exit During";
+    				$storedProc= "call spPopulateTmpReportExitDuring('".$searchStartDate."','".$searchEndDate."','".$searchProgram."',".$searchSchoolDistrictID.",".$searchResourceSpecialistID.")";
+    				$sql = "select * from tmpReportExitDuring";
+    				break;
+    			case 'gtcapplicant':
+    				$reportNameDisplay = "GtC Applicants";
+    				$storedProc= "call spPopulateTmpReportGtCApplicant('".$searchStartDate."','".$searchEndDate."',".$searchSchoolDistrictID.")";
+    				$sql = "select * from tmpReportGtCApplicant";
+    				break;
+    		}
+
+    		mysql_query($storedProc,  $connection) or die($storedProc. "<br/>There were problems with the database stored proc.  If you continue to have problems please contact us.<br/>");
+    		$statusResult= mysql_query($sql,  $connection) or die($sql."<br/>There were problems with the database query.  If you continue to have problems please contact us.<br/>");    		
+    		$num_of_rows = mysql_num_rows ($statusResult);
+    		
+    		$i=1;
+    		$csv_output ="";
+    		$csv_header ="";
+    		while($statusRow = mysql_fetch_assoc($statusResult)){
+    			$tableRow .="<tr>";
+    			$csv_row = "";
+    			foreach($statusRow as $key=>$value){
+    				$tableRow .="<td>".$value."</td>";
+    				$arrProgramKeys[$key] = $key;
+    				if($i == 1)$csv_header .= $key . ",";
+    				$value = str_replace(",", ";", $value);
+    				$csv_row .= $value.",";
+    			}
+    			$tableRow .="</tr>";
+    			$csv_output .= substr($csv_row, 0, -1). "\n";
+    			$i++;
+    		}
+    		$csv_header = substr($csv_header, 0, -1). "\n";
+    		$csv_output = $csv_header . $csv_output;
+    		foreach($arrProgramKeys as $keys=>$value){
+    			$tableHeader .= "<th class='indentityField'>".$value."</th>";
+    		}
+    		$display_Count = "<li>Count: ".$num_of_rows."</li>";
+    		$table = "<table id='reportDataTable' class='csvData tablesorter'><thead><tr>".$tableHeader."</tr></thead><tbody>".$tableRow."</tbody></table>";
+    		
+    		break;
+    			
     case 'endOfTerm':
         $sql = "SELECT COUNT(currentStatus) AS sCount, currentStatus FROM tmpReportStatus GROUP BY currentStatus";
         $statusResult = mysql_query($sql,  $connection) or die($sql. "<br/>There were problems connecting to the contact data via search.  If you continue to have problems please contact us.<br/>");

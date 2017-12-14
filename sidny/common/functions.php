@@ -454,27 +454,44 @@ $SQL1 = "SELECT contactID, program, max(statusDate) as MaxStatusDate,
       $ids = join(',',$arrEnrolledList);
     
 
-       $SQL = " SELECT distinct a.contactID, a.firstName, a.lastName, a.bannerGNumber, a.emailPCC, a.phoneNum1, a.emailAlt      
-          FROM contact a 
-           RIGHT JOIN status b 
-            ON a.contactID=b.contactID  
-              AND b.statusID in 
-                 (
-                   select substring_index(d.maxDateString, ':', -1) as statusID_val from 
-         (  
-          SELECT max(concat(f.statusDate, ':',f.keyStatusID, ':', statusID)) as maxDateString,  f.undoneStatusID 
-             FROM status f 
-               WHERE (f.undoneStatusID IS NULL) AND f.keyStatusID=6 
-                   AND f.contactID in ($ids) 
-                   GROUP BY f.contactID, f.keyStatusID                        
-           ) d
-                  )
-                  RIGHT JOIN statusResourceSpecialist c 
-	               ON b.statusID=c.statusID
-                    RIGHT JOIN keyResourceSpecialist d 
-              	 	 ON c.keyResourceSpecialistID = d.keyResourceSpecialistID 
-                      WHERE  d.keyResourceSpecialistID=$keyResourceSpecialistID     
-                      ORDER BY a.lastName, a.firstName ";
+       $SQL = " SELECT distinct a.contactID, a.firstName, a.lastName, a.bannerGNumber, a.emailPCC, a.phoneNum1, a.emailAlt, program.program, keySchoolDistrict.schoolDistrict      
+				FROM contact a 
+					INNER JOIN status b 
+						ON a.contactID=b.contactID  
+							AND b.statusID in (
+                   				select substring_index(d.maxDateString, ':', -1) as statusID_val 
+							  	from ( SELECT max(concat(f.statusDate, ':',f.keyStatusID, ':', statusID)) as maxDateString,  f.undoneStatusID 
+							           FROM status f 
+							           WHERE (f.undoneStatusID IS NULL) AND f.keyStatusID=6 
+							           	AND f.contactID in ($ids) 
+							           GROUP BY f.contactID, f.keyStatusID                        
+							           ) d
+                  					)
+					INNER JOIN statusResourceSpecialist c 
+						ON b.statusID=c.statusID
+					INNER JOIN keyResourceSpecialist d 
+						ON c.keyResourceSpecialistID = d.keyResourceSpecialistID
+					LEFT JOIN (SELECT contactID, substring_index(maxDateString, ':', -1) as statusID
+								FROM (SELECT contactID, max(concat(statusDate, ':', statusID)) as maxDateSTring
+										FROM status
+										WHERE undoneStatusID IS NULL AND keyStatusID IN (2,13,14,15,16)
+										GROUP BY contactID
+									  ) maxEnrollStatus
+								) enrollStatus
+						ON enrollStatus.contactID = a.contactID
+					LEFT JOIN status program ON enrollStatus.statusID = program.statusID
+					LEFT JOIN (SELECT contactID, substring_index(maxDateString, ':', -1) as statusID
+								FROM (SELECT contactID, max(concat(statusDate, ':', statusID)) as maxDateSTring
+										FROM status
+										WHERE undoneStatusID IS NULL AND keyStatusID = 7
+										GROUP BY contactID
+									  ) maxSDStatus
+								) sdStatus
+						ON sdStatus.contactID = a.contactID
+					LEFT JOIN statusSchoolDistrict ON sdStatus.statusID = statusSchoolDistrict.statusID
+					LEFT JOIN keySchoolDistrict ON statusSchoolDistrict.keySchoolDistrictID = keySchoolDistrict.keySchoolDistrictID 
+				WHERE  d.keyResourceSpecialistID=$keyResourceSpecialistID     
+		 		ORDER BY a.lastName, a.firstName ";
        }
     
     //STEP 3
@@ -488,7 +505,10 @@ $SQL1 = "SELECT contactID, program, max(statusDate) as MaxStatusDate,
 	while($row = mysql_fetch_assoc($result)){
 		if($contact1 != $row['contactID']){
 		//    $arrStudentList[$row['contactID']]= array('yes_plus' => "", 'contactID' => $row['contactID'], 'bannerGNumber' => $row['bannerGNumber'], 'lastName' => $row['lastName'], 'firstName' => $row['firstName'], 'emailPCC' => $row['emailPCC'], 'phoneNum1' => $row['phoneNum1'], 'emailAlt' => $row['emailAlt']);
-               $arrStudentList[$row['contactID']]= array('contactID' => $row['contactID'], 'bannerGNumber' => $row['bannerGNumber'], 'lastName' => $row['lastName'], 'firstName' => $row['firstName'], 'emailPCC' => $row['emailPCC'], 'phoneNum1' => $row['phoneNum1'], 'emailAlt' => $row['emailAlt']);
+               $arrStudentList[$row['contactID']]= array('contactID' => $row['contactID'], 'bannerGNumber' => $row['bannerGNumber'],
+               		'lastName' => $row['lastName'], 'firstName' => $row['firstName'], 'emailPCC' => $row['emailPCC'],
+               		'phoneNum1' => $row['phoneNum1'], 'emailAlt' => $row['emailAlt'], 'program' => $row['program'],
+               		'schoolDistrict' => $row['schoolDistrict']);
                $contactID1 = $row['contactID'];
                $sql_plus = " select keyStatusID from status 
                                WHERE keyStatusID in (13,14) and undoneStatusID is NULL and contactID = $contactID1 ";   // 10-21-13
@@ -496,14 +516,17 @@ $SQL1 = "SELECT contactID, program, max(statusDate) as MaxStatusDate,
                $num_rows_plus = mysql_num_rows ($result_plus);
 
                if($num_rows_plus > 0){
-                $arrStudentList[$row['contactID']]= array('yes_plus' => '++', 'contactID' => $row['contactID'], 'bannerGNumber' => $row['bannerGNumber'], 'lastName' => $row['lastName'], 'firstName' => $row['firstName'], 'emailPCC' => $row['emailPCC'], 'phoneNum1' => $row['phoneNum1'], 'emailAlt' => $row['emailAlt']);
+                	$arrStudentList[$row['contactID']]= array('yes_plus' => '++', 'contactID' => $row['contactID'], 'bannerGNumber' => $row['bannerGNumber'],
+                			'lastName' => $row['lastName'], 'firstName' => $row['firstName'], 'emailPCC' => $row['emailPCC'],
+                			'phoneNum1' => $row['phoneNum1'], 'emailAlt' => $row['emailAlt'], 'program' => $row['program'],
+                			'schoolDistrict' => $row['schoolDistrict']);
 
                }
 		}
              	$contact1 = $row['contactID'];  //check this!
 	}
     }else{
-	$arrStudentList[0] = "There are no active students for the Resource Specialist.";
+		$arrStudentList[0] = "There are no active students for the Resource Specialist.";
     }
     //echo $arrStudentList;
     return $arrStudentList ;
@@ -594,22 +617,24 @@ function displayListRS($keyResourceSpecialistID, $history, $display, $arrStudent
 //	if(substr_count($studentList['rsName'], $resourceSpecialistName)>0){
 	    $countStudent++;
 	    if($display=='table'){
-		$caseLoadTbl .="<tr>";
-		//$caseLoadTbl .="<td><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['contactID']."</a></td>";
-           //   $caseLoadTbl .="<td>".$studentList['yes_plus']."</td>";
-		$caseLoadTbl .="<td><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['bannerGNumber']."</a></td>";
-		$caseLoadTbl .="<td><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['lastName'].", ".$studentList['firstName']."</a></td>";
-              $caseLoadTbl .="<td><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['emailPCC']."</a></td>";
-              $caseLoadTbl .="<td><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['emailAlt']."</a></td>";
-	//	$caseLoadTbl .="<td>".$studentList['rsName']."</td>";
-              $caseLoadTbl .="<td>".$studentList['phoneNum1']."</td>";
-		$caseLoadTbl .="</tr>";
+			$caseLoadTbl .="<tr>";
+			//$caseLoadTbl .="<td><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['contactID']."</a></td>";
+	        //   $caseLoadTbl .="<td>".$studentList['yes_plus']."</td>";
+			$caseLoadTbl .="<td><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['bannerGNumber']."</a></td>";
+			$caseLoadTbl .="<td><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['lastName'].", ".$studentList['firstName']."</a></td>";
+	        $caseLoadTbl .="<td><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['emailPCC']."</a></td>";
+	        $caseLoadTbl .="<td><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['emailAlt']."</a></td>";
+			//	$caseLoadTbl .="<td>".$studentList['rsName']."</td>";
+	        $caseLoadTbl .="<td>".$studentList['phoneNum1']."</td>";
+	        $caseLoadTbl .="<td>".$studentList['program']."</td>";
+	        $caseLoadTbl .="<td>".$studentList['schoolDistrict']."</td>";
+			$caseLoadTbl .="</tr>";
 	    }else{
-	//	$caseLoadList .= "<li><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['yes_plus'].$studentList['bannerGNumber']."</a><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['lastName'].", ".$studentList['firstName'].",".
-$studentList['emailPCC'].", ".$studentList['emailAlt'].", ".$studentList['phoneNum1']."</a>";
-              $caseLoadList .= "<li><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['bannerGNumber']."</a><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['lastName'].", ".$studentList['firstName'].",".
-$studentList['emailPCC'].", ".$studentList['emailAlt'].", ".$studentList['phoneNum1']."</a>";
-     //.$studentList['rsName'];
+			//	$caseLoadList .= "<li><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['yes_plus'].$studentList['bannerGNumber']."</a><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['lastName'].", ".$studentList['firstName'].",".
+			$studentList['emailPCC'].", ".$studentList['emailAlt'].", ".$studentList['phoneNum1']."</a>";
+			$caseLoadList .= "<li><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['bannerGNumber']."</a><a href='sidny.php?cid=".$studentList['contactID']."'>".$studentList['lastName'].", ".$studentList['firstName'].",".
+			$studentList['emailPCC'].", ".$studentList['emailAlt'].", ".$studentList['phoneNum1']."</a>";
+			//.$studentList['rsName'];
 	    }
 //	}
     }
@@ -624,7 +649,7 @@ $studentList['emailPCC'].", ".$studentList['emailAlt'].", ".$studentList['phoneN
     //return the requested display format ie. table or list.
     if($display=='table'){
 	// $caseLoad .="<table class='tablesorter caseList'><tr><th>MAP+/YES+</th><th>G Number</th><th>Student Name</th><th>Email-PCC </th><th>Email-Alt</th><th>Phone</th></tr>";
-        $caseLoad .="<table class='tablesorter caseList'><tr><th>G Number</th><th>Student Name</th><th>Email-PCC </th><th>Email-Alt</th><th>Phone</th></tr>";
+        $caseLoad .="<table class='tablesorter caseList'><tr><th>G Number</th><th>Student Name</th><th>Email-PCC </th><th>Email-Alt</th><th>Phone</th><th>Program</th><th>School District</th></tr>";
       //<th>Resource Specialist(s)</th></tr>";
 	$caseLoad .= $caseLoadTbl;
 	$caseLoad .= "</td></tr></table>";

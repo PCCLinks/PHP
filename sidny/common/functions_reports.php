@@ -660,4 +660,75 @@ function tmpReportStopped($searchProgram, $searchStartDate, $searchEndDate, $tem
 }
 ################################################################################################################
 
+################################################################################################################
+function v2_tempReportSD(){
+	//###########################################
+	//Created 12/4/2017 Arlette Slachmuylder - part of report revision
+	//Referenced From: reports_table.php
+	//###########################################
+
+	
+	global $connection;
+	$sql = "DROP TABLE IF EXISTS v2_tmpReportSD";
+			
+	$sql= mysql_query($sql,  $connection) or die($sql. "<br/>There were problems with the database query.  If you continue to have problems please contact us.<br/>");
+	
+	$sql = "CREATE table v2_tmpReportSD as
+		SELECT contact.contactID
+			, contact.bannerGnumber
+			, statusDate as sdDate
+			, schoolDistrict
+		FROM contact
+			INNER JOIN status on contact.contactID = status.contactID
+				AND status.keyStatusID = (7) # SD
+				AND undoneStatusID is null # status change hasnt been undone
+			LEFT JOIN statusSchoolDistrict
+		on status.statusID = statusSchoolDistrict.statusID
+		left join keySchoolDistrict
+		on statusSchoolDistrict.keySchoolDistrictID = keySchoolDistrict.keySchoolDistrictID";	
+	
+	$sql= mysql_query($sql,  $connection) or die($sql. "<br/>There were problems with the database query.  If you continue to have problems please contact us.<br/>");
+	
+}
+################################################################################################################
+
+################################################################################################################
+function v2_tempReportEnroll(){
+	//###########################################
+	//Created 12/4/2017 Arlette Slachmuylder - part of report revision
+	//Referenced From: reports_table.php
+	//###########################################
+	
+	
+	global $connection;
+	$sql = "DROP TABLE IF EXISTS v2_tmpReportEnroll";
+			
+			$sql= mysql_query($sql,  $connection) or die($sql. "<br/>There were problems with the database query.  If you continue to have problems please contact us.<br/>");
+			
+			$sql = "CREATE TABLE v2_tmpReportEnroll
+				select contact.contactId, contact.bannerGNumber, firstName, lastName
+				, case when lower(program) = 'gtc' then 'gtc'
+						when program in ('ytc', 'yes', 'map') then 'yes' 
+				        else 'na' end as program
+				, race, ethnicity, dob, hsCreditsEntry, hsGpaEntry, gender
+				, status.statusDate as EnrollDate
+				, emailPCC
+				, emailAlt
+				, ssid
+				from contact	
+					inner join status on contact.contactID = status.contactID
+						# 2=enroll, 13=ytc cred, 14=ytc ell cred, 15=ytc ell attend, 16=ytc attend
+						and status.keyStatusID IN (2,13,14,15,16) #enroll
+						and undoneStatusID is null # status change hasnt been undone
+						and contact.firstName <> 'Test'
+						and contact.lastName <> 'Test'
+						and contact.lastName <> 'testSD'
+				        and program in ('ytc', 'yes', 'map', 'gtc')";
+					
+			$sql= mysql_query($sql,  $connection) or die($sql. "<br/>There were problems with the database query.  If you continue to have problems please contact us.<br/>");
+					
+}
+################################################################################################################
+
+
 ?>

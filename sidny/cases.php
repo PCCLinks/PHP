@@ -222,20 +222,20 @@ $search_rs_menuOptions_current = rsMenuOptions(1);
 	    });
 	    
 	    $('#searchRS').change(function() {
-		$(document).ready(function() {
-			//Collect all the data from the hidden fields and serialize them so they can be added to the querystring.
-			var queryString = $("#fCases").serialize();
-			
-			// the data could now be submitted using $.get, $.post, $.ajax, etc 
-			$.ajax({
-				type: "POST",
-				url: "tabs/cases_admin.php",
-				data: queryString,
-				success: function(response){
-				    $('#caseLoadAdmin').html(response);
-				}
+			$(document).ready(function() {
+				//Collect all the data from the hidden fields and serialize them so they can be added to the querystring.
+				var queryString = $("#fCases").serialize();
+				
+				// the data could now be submitted using $.get, $.post, $.ajax, etc 
+				$.ajax({
+					type: "POST",
+					url: "tabs/cases_admin.php",
+					data: queryString,
+					success: function(response){
+					    $('#caseLoadAdmin').html(response);
+					}
+				});
 			});
-		});
 	    });
 	    //submit Admin List onchange of resource specialist
 	    $('#searchRSHistory').change(function() {

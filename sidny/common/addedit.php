@@ -42,6 +42,16 @@ foreach($_POST as $k=>$v){
 
 //Switch depending on the table destination.
 switch($tName){
+	case "contactCareerIndustry";
+		if($arrForm["checked"] == 1){
+			$sql = "insert into contactCareerIndustry(contactID, careerIndustryID)";
+			$sql .= "values(".$arrForm["contactID"].",".$arrForm["careerIndustryID"].")";
+		}else{
+			$sql = "delete from contactCareerIndustry ";
+			$sql .= "where contactID = ".$arrForm["contactID"]." and careerIndustryID =".$arrForm["careerIndustryID"];
+		}
+		mysql_query($sql,  $connection) or die("$sql<br/>There were problems inserting your program application information.  If you continue to have problems please contact us.");
+		break;
     case "newTmp";
         //New Tmp comes from new_student.php and new_contactTmp.php. Data is saved into the
         //contactTmp table before it is committed via newContact from new_record.php.
@@ -217,6 +227,16 @@ switch($tName){
             //databaseAddEdit($arrForm, $arrTblFields, $arrExclude, $tbl, $tblID, $tblValueID);
 
         break;
+         case "contactCareerOccupation";
+         	$tbl = $tName;
+         	$tblID = "contactCareerOccupationID";
+         	$tblValueID = $contactCareerOccupationID;
+         	//Find the table variables and set the exclude array
+         	$arrTblfields = fieldNameArray('contactCareerOccupation');
+         	//Exclude all the hidden variables used for processing form but not saved in table.
+         	$arrExclude = array('contactCareerOccupationID');
+         	break;
+         	
     default; //for contact, gtc, yes, map, pd, fc
         $tbl = $tName;
         //set the name of the table ID field.
@@ -277,9 +297,9 @@ switch($tName){
             
 	    //Enter into database.
 	    if(!empty($fINSERT)){
-                $currentDate = date("Y-m-d H:i:s"); 
-		$SQL = "INSERT INTO ".$tbl." (" . $fINSERT .", ".$tbl."RecordStart) VALUES(".$vINSERT.",'".$currentDate."' )";
-		$result = mysql_query($SQL,  $connection) or die("$SQL<br/>There were problems updating your information.  If you continue to have problems please contact us.");
+            $currentDate = date("Y-m-d H:i:s"); 
+			$SQL = "INSERT INTO ".$tbl." (" . $fINSERT .", ".$tbl."RecordStart) VALUES(".$vINSERT.",'".$currentDate."' )";
+			$result = mysql_query($SQL,  $connection) or die("$SQL<br/>There were problems updating your information.  If you continue to have problems please contact us.");
                 $id= mysql_insert_id();
                 $arrTblVariables[$tblID] = $id;
                 //$arrTblVariables['sql1']= $SQL; //error checking

@@ -62,8 +62,8 @@ if($_SESSION['adminLevel']<5){
 
 ################################################################################################################
 //Create form inputs for resource specialist.
-    $rs_menuOptions = "\n<option value=''></option>";
-    $SQLrs = "SELECT * FROM keyResourceSpecialist WHERE current = '1'" ;
+    $rs_menuOptions = "\n<option value=0>--Select All--</option>";
+    $SQLrs = "SELECT * FROM keyResourceSpecialist WHERE current = '1' order by rsName" ;
     $result = mysql_query($SQLrs,  $connection) or die("There were problems connecting to the resource specialist data.  If you continue to have problems please contact us.<br/>");
     while($row = mysql_fetch_assoc($result)){
 	if($row['keyResourceSpecialistID']==$keyResourceSpecialistID) $selectedOption = ' selected';
@@ -72,7 +72,7 @@ if($_SESSION['adminLevel']<5){
     }
 ################################################################################################################
 //Create form inputs for school district.
-    $sd_menuOptions = "\n<option value=''></option>";
+    $sd_menuOptions = "\n<option value=0>--Select All--</option>";
     $SQLsd = "SELECT * FROM keySchoolDistrict" ;
     $result = mysql_query($SQLsd,  $connection) or die("There were problems connecting to the school district data.  If you continue to have problems please contact us.<br/>");
     while($row = mysql_fetch_assoc($result)){
@@ -131,9 +131,32 @@ if($_SESSION['searchTermEnd'] == '') $_SESSION['searchTermEnd']= $searchTermEnd;
 	<script type="text/javascript" src="common/js/jquery/plugin/jquery.slidePanel.js"></script>
 	<script type="text/javascript" src="common/js/search_panel.js"></script>
 	<!--<script type="text/javascript" src="common/js/jquery/plugin/jquery.pluginsCombo.min.js" ></script>-->
-	<script type="text/javascript">
+
+<script type="text/javascript">
 function showReportFilters(area, value){
     $(document).ready(function() {
+        if(area == 'searchReport'){
+            $('#searchProgramLabel').show();
+            $('#searchProgram').show();
+            $('#searchSchoolDistrictIDLabel').show();
+            $('#searchSchoolDistrictID').show();
+    	    $('#timeFrame').show();
+            if(value == 'exitDuring'){
+                $('#searchResourceSpecialistIDLabel').show();
+            	$('#searchResourceSpecialistID').show();
+            }else{
+                $('#searchResourceSpecialistIDLabel').hide();
+            	$('#searchResourceSpecialistID').hide();
+            }
+    	    if(value == 'gtcapplicant'){
+        	    $('#searchProgramLabel').hide();
+        	    $('#searchProgram').hide();
+    	    }
+        }
+    });
+}
+
+    /*
 	if(area=='searchProgram'){
 	    $('#searchReport').show();
 	    if(value=='gtc'){
@@ -199,30 +222,55 @@ function showReportFilters(area, value){
 	    if(value=='changeOfLevel'){
 		$('#filters').show();
 	    };
-	};
+	}; 
     });
-};
+};*/
 </script>
 </head>
+
 <body class="R2">
-	<div class="container">
+	<div class="container" style="min-height:200px;">
 		<?php include 'common/inc_header.php' ;?>
 		<?php include 'common/inc_top_navigation.php' ;?>
 		<div class="clear view-content">
 		    <div id='findReport'>
-		    	<form id='fReport' accept-charset='UTF-8' class="cmxform" method='post' action='tabs/reports_table.php'>
+		    <form id='fReport' accept-charset='UTF-8' class="cmxform" method='post' action='tabs/reports_table.php'>
 			<div class='contact_left'> 
 			    <fieldset  class='group1'>
 			    <legend>Report Search</legend>
 			    <ol class='dataform'>
-				    <li>
-					    <label for='searchProgram'>Program:</label>
-					    <select name='searchProgram' id='searchProgram' value='' onchange="showReportFilters('searchProgram',this[this.selectedIndex].value)">
-						<?php echo $program_menuOptions ?>
+			     <li>
+					    <label for='searchReport'>Report:</label>
+					    <select name='searchReport' id='searchReport' value='' style='width:150px'  onchange="showReportFilters('searchReport',this[this.selectedIndex].value)">
+						<option value=''></option>
+						<option value='gtcapplicant'>GtC Applicant</option>
+						<option value='enrolledDuring'>Enrollment During</option>
+						<option value='activeDuring'>Active During</option>
+						<option value='exitDuring'>Exit During</option>
 					    </select>
 				    </li>
 				    <li>
-					    <label for='searchReport'>Report:</label>
+					    <label for='searchProgram' id='searchProgramLabel'>Program:</label>
+					    <select name='searchProgram' id='searchProgram' value='' onchange="showReportFilters('searchProgram',this[this.selectedIndex].value)">
+						<option value=""></option>
+						<option value="gtc">GtC</option>
+						<option value="ytc">YtC</option>
+					    </select>
+				    </li>
+				    <li>
+					    <label for='searchSchoolDistrictID' id='searchSchoolDistrictIDLabel'>School District:</label>
+					    <select name='searchSchoolDistrictID' id='searchSchoolDistrictID' value=0>
+							<?php echo $sd_menuOptions ?>
+					    </select>
+					</li>
+					<li>
+					    <label for='searchResourceSpecialistID' id='searchResourceSpecialistIDLabel'>Coach:</label>
+					    <select name='searchResourceSpecialistID' id='searchResourceSpecialistID' value=0>
+						<?php echo $rs_menuOptions?>
+					    </select>
+					</li>
+				     <!--  <li>
+					 <label for='searchReport'>Report:</label>
 					    <select name='searchReport' id='searchReport' value='' style='width:150px'  onchange="showReportFilters('searchReport',this[this.selectedIndex].value)">
 						<option value=''></option>
 						<option value='applicant'>Applicant</option>
@@ -230,15 +278,16 @@ function showReportFilters(area, value){
                                           <option value='exitReasonSummary'> Exit Reason Summary </option> 
                                           <option value='graduationRate'> Graduation Rate </option>
                                           <option value='retentionRate'> Retention Rate </option>
-					<!--	<option value='endOfTerm'>End of Term</option>
+                                          <option value='activeduring'>Active During</option>
+						<option value='endOfTerm'>End of Term</option>
 						<option value='transition'>Transition between Programs</option>
 						<option value='stopOut'>Stop Out</option>
 						<option value='foundation'>Foundation Term Success Rate</option>
 						<option value='courses'>Courses</option>
 						<option value='iptScores'>IPT Scores</option>
-						<option value='changeOfLevel'>Change of Level</option>  -->
+						<option value='changeOfLevel'>Change of Level</option>  
 					    </select>
-				    </li>
+				    </li>-->
 			    </ol>
 			    </fieldset>
 			</div>
@@ -279,10 +328,10 @@ function showReportFilters(area, value){
 		    </div>
 			    </fieldset>
 			
-			    <fieldset  class='group1'>
+<!-- 	<fieldset  class='group1'>
 			    <legend>Status Filter</legend>
 			    <div id='filters' >
-			    <ol class='dataform'><!--
+			    <ol class='dataform'>
 				    
 				    <li>
 					    <label for='searchFirstName'>First Name:</label>
@@ -303,7 +352,7 @@ function showReportFilters(area, value){
 				    <li>
 					    <label for='searchDob'>Date of Birth:</label>
 					    <input type='text' maxlength='128' name='searchDob' id='searchDob' size='15' value='<?php echo $_SESSION['searchDob']; ?>' title='Select the date of birth of the student.' />
-				    </li>    -->
+				    </li>   
 				    
 				    
 				    <li>
@@ -326,19 +375,20 @@ function showReportFilters(area, value){
 					    <select name='searchSchoolDistrictID' id='searchSchoolDistrictID' value=''>
 						<?php echo $sd_menuOptions ?>
 					    </select>
-				    </li>
+				    </li>  
 				    
-				<!--    <li>
+			    <li>
 					    <label for='searchResourceSpecialistID'>Resource Specialist</label>
 					    <select name='searchResourceSpecialistID' id='searchResourceSpecialistID' value=''>
 						<?php echo $rs_menuOptions ?>
 					    </select>
-				    </li>  -->
+				    </li>  
 				    <input type='hidden' name='start_search' id='start_search' value='1' />
 
 				</ol>
 			    </div>
-                         </fieldset>
+	</fieldset> -->
+                         
 			    <div>
 				    <button type='button' id='submitReport'>Request Report</button>
 				    <input type='submit' name='search' id='edit-submit' value='Search' />
@@ -373,10 +423,17 @@ function showReportFilters(area, value){
 
 
 	//Hide all form sections.  Show on a need to know based on tableID variables below.
-	$('#searchReport').hide();
+	//$('#searchReport').hide();
 	$('#timeFrame').hide();
 	$('#searchByTerm').hide();
 	$('#filters').hide();
+
+    $('#searchResourceSpecialistIDLabel').hide();
+    $('#searchResourceSpecialistID').hide();
+    $('#searchProgramLabel').hide();
+    $('#searchProgram').hide();
+    $('#searchSchoolDistrictIDLabel').hide();
+    $('#searchSchoolDistrictID').hide();
 	
 	//hide all submit buttons
 	$("input:submit").hide();
@@ -407,10 +464,10 @@ function validateReport(){
 
 			$("#fReport").validate({
 				onsubmit: false,
-				rules:{
-				    searchProgram: {required: true}
+				//rules:{
+				///    searchProgram: {required: true}
 				    
-				},
+				//},
 				onkeyup:false,
 			});
 		
