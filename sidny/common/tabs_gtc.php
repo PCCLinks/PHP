@@ -4,6 +4,7 @@
         <ul>
             <li><a href="tabs/gtc_orientation.php">Orientation</a></li>
             <li><a href="tabs/gtc_eval_interview.php">Evaluation/Interview</a></li>
+            <li><a href="tabs/gtc_riskfactor.php">Risk Factors</a></li>
             <li><a href="tabs/gtc_career.php">Careers</a></li>
            <!-- <li><a href="tabs/gtc_hs.php">HS Info</a></li> -->
             <li><a href="tabs/gtc_placement.php">Placement</a></li>

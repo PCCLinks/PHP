@@ -104,6 +104,8 @@ LEFT JOIN statusSchoolDistrict ON status.statusID = statusSchoolDistrict.statusI
 LEFT JOIN statusStopped ON status.statusID = statusStopped.statusID
 WHERE status.contactID ='". $_SESSION['contactID']."' AND status.statusID = ".$statusID ;
     $result = mysql_query($SQLstatus,  $connection) or die($SQLstatus."There were problems connecting to the status set data.  If you continue to have problems please contact us.<br/>");
+    $num_of_rows = mysql_num_rows ($result);
+    echo "numberofrows=".$num_of_rows;
     while($row = mysql_fetch_assoc($result)){
 	foreach($row as $k=>$v){
 	   $$k=$v;

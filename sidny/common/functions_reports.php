@@ -91,6 +91,7 @@ $tmpEmpty = mysql_query($emptySQLStatus,  $connection) or die($emptySQLStatus. "
     }
    }
     $tmpInsertSQLStatus .= " ) d ORDER BY d.contactID, d.statusRecordLast DESC";
+	
 
    $tmpInsertStatus = mysql_query($tmpInsertSQLStatus,  $connection) or die($tmpInsertSQLStatus. "<br/>There were problems connecting to the contact data via search.  If you continue to have problems please contact us.<br/>");
 

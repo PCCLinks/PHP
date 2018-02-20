@@ -35,6 +35,7 @@ if($_SESSION['adminLevel']<3){
 
 ################################################################################################################
 $searchProgram = prepare_str($_POST['searchProgram']);
+$searchProgramDetail = prepare_str($_POST['searchProgramDetail']);
 $searchReport = prepare_str($_POST['searchReport']);
 $searchStartDate = prepare_str($_POST['searchStartDate']);
 $searchEndDate = prepare_str($_POST['searchEndDate']);
@@ -58,6 +59,7 @@ $searchCurrentEnrolled = prepare_str($_POST['searchCurrentEnrolled']);
 ################################################################################################################
 
 $_SESSION['searchProgram'] = $searchProgram;
+$_SESSION['searchProgramDetail'] = $searchProgramDetail;
 $_SESSION['searchReport'] = $searchReport;
 $_SESSION['searchStartDate'] = $searchStartDate;
 $_SESSION['searchEndDate'] = $searchEndDate;
@@ -391,22 +393,23 @@ if(!empty($errorMsg)){
     	case 'enrolledDuring':
     	case 'exitDuring':
     	case 'gtcapplicant':
+    		$searchProgramDetailParam = str_replace("ytc","YtC ",$searchProgramDetail);
     		$storedProc = "";
     		$sql = "";
     		switch($searchReport){
     			case 'activeDuring':
     				$reportNameDisplay = "Active During";
-    				$storedProc= "call spPopulateTmpReportActiveDuring('".$searchStartDate."','".$searchEndDate."','".$searchProgram."',".$searchSchoolDistrictID.")";
+    				$storedProc= "call spPopulateTmpReportActiveDuring('".$searchStartDate."','".$searchEndDate."','".$searchProgram."','".$searchProgramDetailParam."',".$searchSchoolDistrictID.")";
     				$sql = "select * from tmpReportActiveDuring";
     				break;
     			case 'enrolledDuring':
     				$reportNameDisplay = "Enrolled During";
-    				$storedProc= "call spPopulateTmpReportEnrolledDuring('".$searchStartDate."','".$searchEndDate."','".$searchProgram."',".$searchSchoolDistrictID.")";
+    				$storedProc= "call spPopulateTmpReportEnrolledDuring('".$searchStartDate."','".$searchEndDate."','".$searchProgram."','".$searchProgramDetailParam."',".$searchSchoolDistrictID.")";
     				$sql = "select * from tmpReportEnrolledDuring";
     				break;
     			case 'exitDuring':
     				$reportNameDisplay = "Exit During";
-    				$storedProc= "call spPopulateTmpReportExitDuring('".$searchStartDate."','".$searchEndDate."','".$searchProgram."',".$searchSchoolDistrictID.",".$searchResourceSpecialistID.")";
+    				$storedProc= "call spPopulateTmpReportExitDuring('".$searchStartDate."','".$searchEndDate."','".$searchProgram."','".$searchProgramDetailParam."',".$searchSchoolDistrictID.",".$searchResourceSpecialistID.")";
     				$sql = "select * from tmpReportExitDuring";
     				break;
     			case 'gtcapplicant':
@@ -711,14 +714,17 @@ if(!empty($errorMsg)){
 
 $reportHeader = "<ul>";
 $reportHeader .= "<h2>".$reportNameDisplay." Report</h2>";
-$reportHeader .= "<li>Program: ".$searchProgram."</li>";
+if($searchProgramDetail != "0") 
+	$reportHeader .= "<li>Program: ".$searchProgramDetailParam."</li>";
+else
+	$reportHeader .= "<li>Program: ".str_replace("0","All",$searchProgram)."</li>";
 // if(empty($searchStatusType)) $searchStatusType= 'Enrolled/Exited';
 if($searchStatusType) $reportHeader .= "<li>Status Type: ".$searchStatusType."</li>";
 if($searchResourceSpecialistID) $reportHeader .= "<li>RS: ".$searchResourceSpecialistID."</li>";
 if($searchSchoolDistrictID) $reportHeader .= "<li>SD: ".$searchSchoolDistrictID."</li>";
 if($searchStartDate || $searchEndDate) $reportHeader .= "<li> Dates: ".$searchStartDate." through " .$searchEndDate."</li>";
 if($searchTermStart || $searchTermEnd) $reportHeader .= "<li> Term duration: ".$searchTermStart." through " .$searchTermEnd."</li>";
-
+$reportHeader .= $display_Count;
 if($searchStatusType){
  $reportHeader .= $display_Count;
  $reportHeader .= "<li> Status label: 1=Applicant 2=Enrolled 3=Exited 12=Stop-out </li>";
@@ -726,7 +732,7 @@ if($searchStatusType){
  $reportHeader .= "</ul>";
 
 
-$reportQuery .= "<div id='reportQuery'>".$sql."</div>";
+ $reportQuery .= "<div id='reportQuery'>".$sql.":".$storedProc."</div>";
 
 foreach($arrHideCols as $colNum){
     $jsHiddenCols .= "$('#reportDataTable tr :nth-child(".$colNum.")').hide();\n";
@@ -760,8 +766,8 @@ $_SESSION['reportCSV']= $csv_output;
 <?php echo $display; ?>
 
 <button type='button' id='reportCSV'>CSV</button>
-<!--<button type='button' id='reportPDF'>PDF</button>-->
-<button type='button' id='reportPrint'>Print</button>
+<!--<button type='button' id='reportPDF'>PDF</button>
+<button type='button' id='reportPrint'>Print</button>-->
 <button type='button' id='showQuery'>Show Query</button>
 <button type='button' id='hideQuery'>Hide Query</button>
 <?php echo $reportQuery ; ?>
@@ -778,10 +784,10 @@ $_SESSION['reportCSV']= $csv_output;
             window.location.href='tabs/report_pdf.php';
         });
 	$( "button", "#reportPrint" ).button();
-        $('#reportPint').click(function() {
-            $('#reportDisplay').print();
-            //window.print();
-        });
+	 $('#reportPint').click(function() {
+         $('#reportDisplay').print();
+         //window.print();
+     });
 	$( "button", "#showQuery" ).button();
 	$( "button", "#hideQuery" ).button();
         $('#hideQuery').hide();

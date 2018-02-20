@@ -21,7 +21,7 @@ $contactID = $_SESSION['contactID'];
 
 ################################################################################################################
 //Application Data
-    $SQLgtc = "SELECT gtcID, careerOccupation, careerOther FROM gtc  WHERE contactID ='". $_SESSION['contactID']."'" ;
+    $SQLgtc = "SELECT gtcID, riskFactorMentalHealth, riskFactorOther FROM gtc  WHERE contactID ='". $_SESSION['contactID']."'" ;
     $result = mysql_query($SQLgtc,  $connection) or die($SQLgtc."There were problems connecting to the contact data.  If you continue to have problems please contact us.<br/>");
     $num_of_rows = mysql_num_rows ($result);
     if (0 != $num_of_rows){
@@ -34,29 +34,31 @@ $contactID = $_SESSION['contactID'];
     }
     
 ################################################################################################################
-   $SQLCareerIndustry = "SELECT ci.careerIndustryID, ci.careerIndustryName, CASE WHEN cic.contactID IS NULL THEN 0 ELSE 1 END Flag 
-							FROM careerIndustry ci
-								left join contactCareerIndustry cic on ci.careerIndustryID = cic.careerIndustryID
-										and cic.contactID = ".$_SESSION['contactID']."
-							ORDER BY careerIndustryName ASC";
-    $result = mysql_query($SQLCareerIndustry,  $connection) or die($SQLCareerIndustry."<br>There were problems connecting to the career data.  If you continue to have problems please contact us.<br/>");
+   $SQLRiskFactor = "SELECT rf.riskFactorID, rf.riskFactorName, CASE WHEN crf.contactID IS NULL THEN 0 ELSE 1 END Flag 
+							FROM riskFactor rf
+								left join contactRiskFactor crf  on rf.riskFactorId = crf.riskFactorID
+										and crf.contactID = ".$_SESSION['contactID']."
+							ORDER BY riskFactorName ASC";
+   $result = mysql_query($SQLRiskFactor,  $connection) or die($SQLRiskFactor."<br>There were problems connecting to the career data.  If you continue to have problems please contact us.<br/>");
     $countPerCol = round(mysql_num_rows($result)/2,0);
-    $career_checkboxes= "\n<div style='column-count:2'><div>";
+    $riskFactor_checkboxes= "\n<div style='column-count:2'><div>";
     $i="";
     while($row = mysql_fetch_assoc($result)){
     	$i++;
-    	$career_checkboxes.= "\n<input type='checkbox' name='careerIndustryID' value=".$row['careerIndustryID'];
-    	$career_checkboxes.= " onchange=\"saveCareerCheckboxChanged(this)\" ";
+    	$riskFactor_checkboxes.= "\n<input type='checkbox' name='riskFactorID' value=".$row['riskFactorID'];
+    	$riskFactor_checkboxes.= " onchange=\"saveRiskFactorCheckboxChanged(this)\" ";
     	if($row['Flag'] == 1)
-    		$career_checkboxes.=" checked ";
-    	$career_checkboxes.= ">".$row["careerIndustryName"];
-    	if($row["careerIndustryName"] == "Other")
-    		$career_checkboxes.= "&nbsp;&nbsp;<input type='text' name='careerOther' id='careerOther' class='textInput' value='".$careerOther."' onchange='saveCareerOther(this.value)'/>";
-    	$career_checkboxes.= "<br />";
+    		$riskFactor_checkboxes.=" checked ";
+    	$riskFactor_checkboxes.= ">".$row["riskFactorName"];
+    	if($row["riskFactorName"] == "Other")
+    		$riskFactor_checkboxes.= "&nbsp;&nbsp;<input type='text' name='riskFactorOther' id='riskFactorOther' class='textInput' value='".$riskFactorOther."' onchange='saveRiskFactorOther(this.value)'/>";
+    	if($row["riskFactorName"] == "Mental Health")
+    		$riskFactor_checkboxes.= "&nbsp;&nbsp;<input type='text' name='riskFactorMentalHealth' id='riskFactorMentalHealth' class='textInput' value='".$riskFactorMentalHealth."' onchange='saveRiskFactorMentalHealth(this.value)'/>";
+    	$riskFactor_checkboxes.= "<br />";
     	if($i == $countPerCol)
-    		$career_checkboxes.= "</div><div>";
+    		$riskFactor_checkboxes.= "</div><div>";
     }
-    $career_checkboxes.="</div></div>"
+    $riskFactor_checkboxes.="</div></div>"
 
 ################################################################################################################
 ?>
@@ -71,12 +73,12 @@ $contactID = $_SESSION['contactID'];
 		//disable submit button
 		$("input:submit").attr('disabled', 'disabled');
     });
-    //gtc_career.php
-    function saveCareerCheckboxChanged(checkbox){
+    //gtc_riskfactor.php
+    function saveRiskFactorCheckboxChanged(checkbox){
     	$(document).ready(function() {
     	    //Collect all the data from the hidden fields and serialize them so they can be added to the querystring.
-    	    var hiddenFields = $("#fCareerIndustry :hidden").serialize();
-    	    var addFields = "careerIndustryID="+checkbox.value+"&checked="+(checkbox.checked?1:0)+"&tName=contactCareerIndustry"
+    	    var hiddenFields = $("#fRiskFactor :hidden").serialize();
+    	    var addFields = "riskFactorID="+checkbox.value+"&checked="+(checkbox.checked?1:0)+"&tName=contactRiskFactor"
     	    var queryString = addFields+"&"+hiddenFields;
     	    $.ajax({
 	    		type: "POST",
@@ -87,11 +89,11 @@ $contactID = $_SESSION['contactID'];
     	   });
     	});
     }
-    function saveCareerOccupation(value){
+    function saveRiskFactorMentalHealth(value){
     	$(document).ready(function() {
     	    //Collect all the data from the hidden fields and serialize them so they can be added to the querystring.
-    	    var hiddenFields = $("#fCareerIndustry :hidden").serialize();
-    	    var addFields = "careerOccupation="+value+"&tName=gtc"
+    	    var hiddenFields = $("#fRiskFactor :hidden").serialize();
+    	    var addFields = "riskFactorMentalHealth="+value+"&tName=gtc"
     	    var queryString = addFields+"&"+hiddenFields;
     	    $.ajax({
 	    		type: "POST",
@@ -102,11 +104,11 @@ $contactID = $_SESSION['contactID'];
     	   });
     	});
     }
-    function saveCareerOther(value){
+    function saveRiskFactorOther(value){
     	$(document).ready(function() {
     	    //Collect all the data from the hidden fields and serialize them so they can be added to the querystring.
-    	    var hiddenFields = $("#fCareerIndustry :hidden").serialize();
-    	    var addFields = "careerOther="+value+"&tName=gtc"
+    	    var hiddenFields = $("#fRiskFactor :hidden").serialize();
+    	    var addFields = "riskFactorOther="+value+"&tName=gtc"
     	    var queryString = addFields+"&"+hiddenFields;
     	    $.ajax({
 	    		type: "POST",
@@ -119,18 +121,12 @@ $contactID = $_SESSION['contactID'];
     }
 
 </script>
-<form id='fCareerIndustry' class="cmxform" action='common/addedit.php' method='post' >
+<form id='fRiskFactor' class="cmxform" action='common/addedit.php' method='post' >
 	<input type='hidden' name='contactID' id='contactID' value='<?php echo $_SESSION['contactID']?>'>
 	<input type='hidden' name='gtcID' id='gtcID' value='<?php echo $gtcID ?>'>
-	 <fieldset class='group'>
+    <fieldset class='group'><legend>Risk Factor</legend>
 	    <ol class='dataform'>
-			    <label for=careerOccupation>Career Occupation</label>
-			    <input type='text' name='careerOccupation' id='careerOccupation' class='textInput' tabindex='5' style='width:300px;' value='<?php echo $careerOccupation?>' onchange="saveCareerOccupation(this.value)"/>
-	    </ol>
-	  </fieldset>
-    <fieldset class='group'><legend>Career Industry</legend>
-	    <ol class='dataform'>
-	    <?php echo $career_checkboxes; ?>
+	    <?php echo $riskFactor_checkboxes; ?>
 	   </ol>
     </fieldset>   
     <input type='submit' id='submit' value='Submit' name='submitByButton' />

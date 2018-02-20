@@ -153,6 +153,15 @@ function showReportFilters(area, value){
         	    $('#searchProgram').hide();
     	    }
         }
+    	if(area == 'searchProgram'){
+    	    if(value == 'ytc'){
+        	    $('#searchProgramDetailLabel').show();
+        	    $('#searchProgramDetail').show();
+    	    }else{
+        	    $('#searchProgramDetailLabel').hide();
+        	    $('#searchProgramDetail').hide();
+    	    }   
+        }
     });
 }
 
@@ -229,7 +238,7 @@ function showReportFilters(area, value){
 </head>
 
 <body class="R2">
-	<div class="container" style="min-height:200px;">
+	<div class="container" style="min-height:250px;">
 		<?php include 'common/inc_header.php' ;?>
 		<?php include 'common/inc_top_navigation.php' ;?>
 		<div class="clear view-content">
@@ -251,10 +260,20 @@ function showReportFilters(area, value){
 				    </li>
 				    <li>
 					    <label for='searchProgram' id='searchProgramLabel'>Program:</label>
-					    <select name='searchProgram' id='searchProgram' value='' onchange="showReportFilters('searchProgram',this[this.selectedIndex].value)">
-						<option value=""></option>
-						<option value="gtc">GtC</option>
-						<option value="ytc">YtC</option>
+					    <select name='searchProgram' id='searchProgram' value=0 onchange="showReportFilters('searchProgram',this[this.selectedIndex].value)">
+							<option value="0">--Select All--</option>
+							<option value="gtc">GtC</option>
+							<option value="ytc">YtC</option>
+					    </select>
+				    </li>
+				    <li>
+					    <label for='searchProgramDetail' id='searchProgramDetailLabel'>Program Specifics:</label>
+					    <select name='searchProgramDetail' id='searchProgramDetail' value=0>
+							<option value="0">--Select All--</option>
+							<option value="ytcAttendance">YtC Attendance</option>
+							<option value="ytcCredit">YtC Credit</option>
+							<option value="ytcELLAttendance">YtC ELL Attendance</option>
+							<option value="ytcELLCredit">YtC ELL Credit</option>
 					    </select>
 				    </li>
 				    <li>
@@ -432,6 +451,8 @@ function showReportFilters(area, value){
     $('#searchResourceSpecialistID').hide();
     $('#searchProgramLabel').hide();
     $('#searchProgram').hide();
+    $('#searchProgramDetailLabel').hide();
+    $('#searchProgramDetail').hide();
     $('#searchSchoolDistrictIDLabel').hide();
     $('#searchSchoolDistrictID').hide();
 	

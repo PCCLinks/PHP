@@ -454,7 +454,7 @@ $SQL1 = "SELECT contactID, program, max(statusDate) as MaxStatusDate,
       $ids = join(',',$arrEnrolledList);
     
 
-       $SQL = " SELECT distinct a.contactID, a.firstName, a.lastName, a.bannerGNumber, a.emailPCC, a.phoneNum1, a.emailAlt, program.program, keySchoolDistrict.schoolDistrict      
+       $SQL = " SELECT distinct a.contactID, a.firstName, a.lastName, a.bannerGNumber, a.emailPCC, a.phoneNum1, a.emailAlt, ifnull(ytcStatus.statusText,program.program) program, keySchoolDistrict.schoolDistrict      
 				FROM contact a 
 					INNER JOIN status b 
 						ON a.contactID=b.contactID  
@@ -480,6 +480,8 @@ $SQL1 = "SELECT contactID, program, max(statusDate) as MaxStatusDate,
 								) enrollStatus
 						ON enrollStatus.contactID = a.contactID
 					LEFT JOIN status program ON enrollStatus.statusID = program.statusID
+					LEFT JOIN keyStatus ytcStatus on program.keyStatusID = ytcStatus.keyStatusID
+						AND ytcStatus.keyStatusID in (13,14,15,16)
 					LEFT JOIN (SELECT contactID, substring_index(maxDateString, ':', -1) as statusID
 								FROM (SELECT contactID, max(concat(statusDate, ':', statusID)) as maxDateSTring
 										FROM status
