@@ -2,45 +2,70 @@
 session_start();
 //Session Check
 if (!isset($_SESSION['PCCPassKey'])) {
-    header("Location:http://184.154.67.171/index.php?error=3");
-    exit();
+	header("Location:http://184.154.67.171/index.php?error=3");
+	exit();
 }elseif(isset($_SESSION['PCCPassKey']) && $_SESSION['PCCPassKey'] != $_SESSION['userID'].$_SESSION['adminLevel'].$_SESSION['userLastName']) {
-    header("Location:http://184.154.67.171/index.php?error=3");
-    exit();
+	header("Location:http://184.154.67.171/index.php?error=3");
+	exit();
 }
 
 ################################################################################################################
 //Capture variables
 $contactID = $_SESSION['contactID'];
 ################################################################################################################
-    // connect to a Database
-    include ("../common/dataconnection.php"); 
+// connect to a Database
+include ("../common/dataconnection.php");
 ################################################################################################################
-    // include functions
-    include ("../common/functions.php");
+// include functions
+include ("../common/functions.php");
 
 ################################################################################################################
 //Application Data
-    $SQLgtc = "SELECT * FROM gtc  WHERE contactID ='". $_SESSION['contactID']."'" ;
-    $result = mysql_query($SQLgtc,  $connection) or die($SQLgtc."There were problems connecting to the contact data.  If you continue to have problems please contact us.<br/>");
-    $num_of_rows = mysql_num_rows ($result);
-    if (0 != $num_of_rows){
+$SQLgtc = "SELECT * FROM gtc  WHERE contactID ='". $_SESSION['contactID']."'" ;
+$result = mysql_query($SQLgtc,  $connection) or die($SQLgtc."There were problems connecting to the contact data.  If you continue to have problems please contact us.<br/>");
+$num_of_rows = mysql_num_rows ($result);
+if (0 != $num_of_rows){
 	//set the variable name as the database field name.
 	while($row = mysql_fetch_assoc($result)){
 		foreach($row as $k=>$v){
-	 	   $$k=$v;
+			$$k=$v;
 		}
-    	}
-    }
+	}
+}
 ################################################################################################################
-    $SQLlocation = "SELECT * FROM keyLocation WHERE selectArea = 'campus' AND showGTC = 1 ORDER BY locationText ASC" ;
-    $result = mysql_query($SQLlocation,  $connection) or die("There were problems connecting to the location data.  If you continue to have problems please contact us.<br/>");
-	$gtcLocation_menuOptions = "\n<option value=''></option>";
-    while($row = mysql_fetch_assoc($result)){
-	if($row['locationText']==$gtcLocation) $selectedOption = ' selected';
-	$gtcLocation_menuOptions .= "\n<option".$selectedOption." value='".$row['locationText']."'>". $row['locationText']."</option>";
-	$selectedOption = "";
-    }
+$SQLlocation = "SELECT * FROM keyLocation WHERE selectArea = 'campus' AND showGTC = 1 ORDER BY locationText ASC" ;
+$result = mysql_query($SQLlocation,  $connection) or die("There were problems connecting to the location data.  If you continue to have problems please contact us.<br/>");
+$gtcLocation_menuOptions = "\n<option value=''></option>";
+$campusPreference1_menuOptions = $gtcLocation_menuOptions;
+$campusPreference2_menuOptions = $gtcLocation_menuOptions;
+$campusPreference3_menuOptions = $gtcLocation_menuOptions;
+
+while($row = mysql_fetch_assoc($result)){
+	if($row['locationText']==$gtcLocation){
+		$selectedOptionGtc = ' selected';
+	}
+	$gtcLocation_menuOptions .= "\n<option".$selectedOptionGtc." value='".$row['locationText']."'>". $row['locationText']."</option>";
+	$selectedOptionGtc = "";
+	
+	if($row['locationText']==$campusPreference1){
+		$selectedOptionC1 = ' selected';
+	}
+	$campusPreference1_menuOptions.= "\n<option".$selectedOptionC1." value='".$row['locationText']."'>". $row['locationText']."</option>";
+	$selectedOptionC1 = "";
+	
+	if($row['locationText']==$campusPreference2){
+		$selectedOptionC2 = ' selected';
+	}
+	$campusPreference2_menuOptions.= "\n<option".$selectedOptionC2." value='".$row['locationText']."'>". $row['locationText']."</option>";
+	$selectedOptionC2 = "";
+	
+	if($row['locationText']==$campusPreference3){
+		$selectedOptionC3 = ' selected';
+	}
+	$campusPreference3_menuOptions.= "\n<option".$selectedOptionC3." value='".$row['locationText']."'>". $row['locationText']."</option>";
+	$selectedOptionC3 = "";
+	
+}
 ################################################################################################################
 ?>
 <script type="text/javascript">
@@ -105,8 +130,10 @@ $contactID = $_SESSION['contactID'];
 <form id='fPlacement' class="cmxform" action='common/addedit.php' method='post'>
 	<input type='hidden' name='contactID' id='contactID' value='<?php echo $_SESSION['contactID']?>'>
 	<input type='hidden' name='gtcID' id='gtcID' value='<?php echo $gtcID ?>'>
+	
+	<div class='contact_left'> 
     <fieldset class='group'>
-	<legend> Placement </legend>
+	<legend>Placement </legend>
 	    <ol class='dataform'>
 		<li>
 		    <label for='termApplyingFor'>Term Applying For</label>
@@ -135,5 +162,38 @@ $contactID = $_SESSION['contactID'];
 	    </li>
 	   </ol>
     </fieldset>
+    </div>
+    <fieldset class='group'>
+        <legend>Preferences</legend>
+         <ol class='dataform'>
+         	    <li>
+		<label for='campusPreference1'>Campus Preference #1</label>
+             <select name='campusPreference1' id='campusPreference1' onchange="validatePlacement(this.form.id,this.name,this[this.selectedIndex].value,'gtc', 0)">
+		     <?php echo $campusPreference1_menuOptions; ?>
+		 	 </select>
+	    </li>
+	    <li>
+		<label for='campusPreference2'>Campus Preference #2</label>
+             <select name='campusPreference2' id='campusPreference2' onchange="validatePlacement(this.form.id,this.name,this[this.selectedIndex].value,'gtc', 0)">
+		     <?php echo $campusPreference2_menuOptions; ?>
+		 	 </select>
+		</li>
+	    <li>
+		<label for='campusPreference3'>Campus Preference #3</label>
+             <select name='campusPreference3' id='campusPreference3' onchange="validatePlacement(this.form.id,this.name,this[this.selectedIndex].value,'gtc', 0)">
+		     <?php echo $campusPreference3_menuOptions; ?>
+		 	 </select>
+		</li>
+		<li>
+			<label for='timePreference'>Time Preference</label>
+	             <select name='timePreference' id='timePreference' onchange="validatePlacement(this.form.id,this.name,this[this.selectedIndex].value,'gtc', 0)">
+			     	<option value="">
+			     	<option value="AM" <?php if($timePreference == "AM") echo "selected"?>>AM</option>
+			     	<option value="PM" <?php if($timePreference == "PM") echo "selected"?>>PM</option>
+			 	 </select>
+		</li>
+	</ol>
+	</fieldset>
+
     <input type='submit' id='submit' value='Submit' name='submitByButton' />
 </form>

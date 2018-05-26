@@ -1,6 +1,6 @@
 <?php
 session_start();
-################################################################################################################ 
+################################################################################################################
 //Name: sidny.php
 //Purpose: this is the main page for individual student data.  All of the data collection tabs stem from this page.
 //		At the top of the page is student information and comments.  Under that are all the data tabs for the
@@ -15,21 +15,22 @@ session_start();
 //		tabs_map.php, tabs_pd.php,
 
 
-// added YtC 10/14 
+// added YtC 10/14
 
-################################################################################################################ 
+################################################################################################################
 //Session Check
 if (!isset($_SESSION['PCCPassKey'])) {
-    header("Location:index.php?error=3");
-    exit();
+	header("Location:index.php?error=3");
+	exit();
 }elseif(isset($_SESSION['PCCPassKey']) && $_SESSION['PCCPassKey'] != $_SESSION['userID'].$_SESSION['adminLevel'].$_SESSION['userLastName']) {
-    header("Location:index.php?error=3");
-    exit();
+	header("Location:index.php?error=3");
+	exit();
 }
 
-################################################################################################################ 
+################################################################################################################
 // connect to a Database
 include ("common/dataconnection.php");
+//include ("common/dataconnectionbanner.php");
 
 ################################################################################################################
 // include functions
@@ -48,11 +49,23 @@ $_SESSION['keyStatusID'] = $_GET['keyStatusID'];
 ################################################################################################################
 $_SESSION['contactID'] = $_GET['cid'];
 
+$SQL = "SELECT bannerGNumber FROM contact WHERE contactID ='". $_SESSION['contactID']."'" ;
+$result = mysql_query($SQL,  $connection) or die("There were problems connecting to the contact data via contact.  If you continue to have problems please contact us.<br/>".$SQL);
+while($row = mysql_fetch_assoc($result)){
+	$_SESSION['bannerGNumber'] = $row['bannerGNumber'];
+}
+//$SQL = "SELECT PIDM FROM swvlinks_person WHERE stu_id ='". $_SESSION['bannerGNumber']."'" ;
+//$stid = oci_parse($bannerconnection, $SQL) or die("There were problems connecting to the swvlinks_person.  If you continue to have problems please contact us.<br/>".$SQL);
+//oci_execute($stid) or die("There were problems connecting to the banner swvlinks_person data.  If you continue to have problems please contact us.<br/>");
+//while(oci_fetch($stid)){
+//	$_SESSION['PIDM'] = oci_result( $stid, 'PIDM');
+//}
+
 ################################################################################################################
 //Check if contactID is in gtc
-    $SQLgtc = "SELECT * FROM gtc WHERE contactID ='". $_SESSION['contactID']."'" ;
-    $result = mysql_query($SQLgtc,  $connection) or die("There were problems connecting to the contact data.  If you continue to have problems please contact us.<br/>");
-    $gtcCount = mysql_num_rows ($result);
+$SQLgtc = "SELECT * FROM gtc WHERE contactID ='". $_SESSION['contactID']."'" ;
+$result = mysql_query($SQLgtc,  $connection) or die("There were problems connecting to the contact data.  If you continue to have problems please contact us.<br/>");
+$gtcCount = mysql_num_rows ($result);
 
 ################################################################################################################
 // //Check if contactID is in yes
@@ -67,21 +80,21 @@ $_SESSION['contactID'] = $_GET['cid'];
 //    $mapCount = mysql_num_rows ($result);
 ################################################################################################################
 //Check if contactID is in pd
-    $SQLpd = "SELECT * FROM pd WHERE contactID ='". $_SESSION['contactID']."'" ;
-    $result = mysql_query($SQLpd,  $connection) or die("There were problems connecting to the contact data.  If you continue to have problems please contact us.<br/>");
-    $pdCount = mysql_num_rows ($result);
+$SQLpd = "SELECT * FROM pd WHERE contactID ='". $_SESSION['contactID']."'" ;
+$result = mysql_query($SQLpd,  $connection) or die("There were problems connecting to the contact data.  If you continue to have problems please contact us.<br/>");
+$pdCount = mysql_num_rows ($result);
 
 ################################################################################################################
 //Check if contactID is in fc
-    $SQLfc = "SELECT * FROM fc WHERE contactID ='". $_SESSION['contactID']."'" ;
-    $result = mysql_query($SQLfc,  $connection) or die("There were problems connecting to the contact data.  If you continue to have problems please contact us.<br/>");
-    $fcCount = mysql_num_rows ($result);
+$SQLfc = "SELECT * FROM fc WHERE contactID ='". $_SESSION['contactID']."'" ;
+$result = mysql_query($SQLfc,  $connection) or die("There were problems connecting to the contact data.  If you continue to have problems please contact us.<br/>");
+$fcCount = mysql_num_rows ($result);
 
 ################################################################################################################
 //Check if contactID is in ytc
-    $SQLytc = "SELECT * FROM ytc WHERE contactID ='". $_SESSION['contactID']."'" ;
-    $result = mysql_query($SQLytc,  $connection) or die("There were problems connecting to the contact data.  If you continue to have problems please contact us.<br/>");
-    $ytcCount = mysql_num_rows ($result);
+$SQLytc = "SELECT * FROM ytc WHERE contactID ='". $_SESSION['contactID']."'" ;
+$result = mysql_query($SQLytc,  $connection) or die("There were problems connecting to the contact data.  If you continue to have problems please contact us.<br/>");
+$ytcCount = mysql_num_rows ($result);
 
 ################################################################################################################
 ?>
@@ -131,7 +144,7 @@ $_SESSION['contactID'] = $_GET['cid'];
 			    <li><a href="common/tabs_pd.php">PD</a></li>
 			    <li><a href="common/tabs_fc.php">FC</a></li>
                          <li><a href="tabs/hs_info.php">HS Info</a></li>
-			    <li><a href="tabs/continueEd.php">Continued Ed</a></li>
+			   <!--     <li><a href="tabs/continueEd.php">Continued Ed</a></li> -->
 			    <li><a href="tabs/contact_info.php">Info</a></li>
 			</ul>
 		    </div>  
@@ -147,11 +160,12 @@ $_SESSION['contactID'] = $_GET['cid'];
 		$('#commentList').load('common/form_comments.php');
 		//Set the tabs div
 		$( "#tabs" ).tabs({
+
 			ajaxOptions: {
+
 				error: function( xhr, status, index, anchor ) {
 					$( anchor.hash ).html(
-						"Couldn't load this tab. We'll try to fix this as soon as possible. " +
-						"If this wouldn't be a demo." );
+						"Couldn't load this tab. We'll try to fix this as soon as possible. " );
 				}
 			}
 		});

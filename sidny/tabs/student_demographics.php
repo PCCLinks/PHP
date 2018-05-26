@@ -142,7 +142,7 @@ $contactID = $_SESSION['contactID'];
 
     <div class='contact_left'>  
      <fieldset class='group1'>
-        <legend>PCC Prep Demographics</legend>
+        <legend>PCC Links Demographics</legend>
             <ol class='dataform'> 
             <!-- <div class='contact_left'> -->
 		<li>
@@ -198,6 +198,7 @@ $contactID = $_SESSION['contactID'];
 			    <option value=''>
 			    <option<?php if($gender == '1') echo ' selected'; ?> value='1'>Male
 			    <option<?php if($gender == '2') echo ' selected'; ?>  value='2'>Female
+			    <option<?php if($gender == '3') echo ' selected'; ?>  value='3'>Non-Binary
 			</select>
 		</li>
            </ol>

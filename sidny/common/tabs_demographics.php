@@ -2,8 +2,8 @@
 <div id="tabs-contact" style="width: 845px; font-size: 10pt">
     <div id='cotacts'>
     <ul>
-        <li><a href="tabs/student_demographics.php">PCC Prep/Banner Demographics</a></li>
-        <li><a href="tabs/contact.php">PCC Prep Contact</a></li>
+        <li><a href="tabs/student_demographics.php">PCC Links/Banner Demographics</a></li>
+        <li><a href="tabs/contact.php">PCC Links Contact</a></li>
         <li><a href="tabs/banner_contact.php">Banner Contact</a></li>
         <li><a href="tabs/student_other.php">Student ID</a></li>
     </ul>

@@ -2,10 +2,12 @@
 <div id="tabs-ytc" style="width: 845px; font-size: 10pt">
     <div id='ytc-program'>
     <ul>
-      <li><a href="tabs/map_application.php">Application</a></li>
-        <li><a href="tabs/map_classes.php">Classes</a></li>
-        <li><a href="tabs/map_elpa.php">ELPA</a></li>
+        <!-- <li><a href="tabs/map_application.php">Application</a></li>-->
+        <!-- <li><a href="tabs/map_classes.php">Classes</a></li> -->
+        <!-- <li><a href="tabs/map_elpa.php">ELPA</a></li> -->
         <li><a href="tabs/map_ged.php">GED</a></li>
+        <li><a href="tabs/contact_riskfactor.php">Risk Factors</a></li>
+        <li><a href="tabs/contact_career.php">Careers</a></li>
         <!--<li><a href="tabs/map_plan.php">Plan</a></li>-->
     
     </div>

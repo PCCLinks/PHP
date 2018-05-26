@@ -1,23 +1,23 @@
 <?php
 session_start();
-################################################################################################################ 
+################################################################################################################
 //Name: reports.php
 //Purpose: holds links to all reports except case loads
 //Referenced From: navigation
 //JS functions: jquery, showReportFilters(), validateReport(), ajaxNewSearch()
 //See Also: functions.php, function_batches.php, function_reports.php, reports_table.php, report_csv.php
 
-################################################################################################################ 
+################################################################################################################
 //Session Check
 if (!isset($_SESSION['PCCPassKey'])) {
-    header("Location:index.php?error=3");
-    exit();
+	header("Location:index.php?error=3");
+	exit();
 }elseif(isset($_SESSION['PCCPassKey']) && $_SESSION['PCCPassKey'] != $_SESSION['userID'].$_SESSION['adminLevel'].$_SESSION['userLastName']) {
-    header("Location:index.php?error=3");
-    exit();
+	header("Location:index.php?error=3");
+	exit();
 }
 
-################################################################################################################ 
+################################################################################################################
 // connect to a Database
 include ("common/dataconnection.php");
 
@@ -29,57 +29,57 @@ include ("common/functions_batches.php");
 ################################################################################################################
 //Admin level Check
 if($_SESSION['adminLevel']<5){
-    header("Location:index.php?error=3");
-    exit();
+	header("Location:index.php?error=3");
+	exit();
 }
 
 ################################################################################################################
 //Create the drop down menu of programs.
-    $program_menuOptions = "\n<option value=''></option>";
-    $SQLkeyProgram = "SELECT * FROM keyProgram " ;
-    $result = mysql_query($SQLkeyProgram,  $connection) or die("There were problems connecting to the program names.  If you continue to have problems please contact us.<br/>");
-    while($row = mysql_fetch_assoc($result)){
+$program_menuOptions = "\n<option value=''></option>";
+$SQLkeyProgram = "SELECT * FROM keyProgram " ;
+$result = mysql_query($SQLkeyProgram,  $connection) or die("There were problems connecting to the program names.  If you continue to have problems please contact us.<br/>");
+while($row = mysql_fetch_assoc($result)){
 	if($row['programTable']==$program)$selectOption = ' selected';
 	$program_menuOptions .= "\n<option".$selectOption." value='".$row['programTable']."'>". $row['programName']."</option>";
 	$selectOption = "";
-    }
+}
 
 ################################################################################################################
 
 //Create form inputs for exit reasons.
-    $exitReason_menuOptions = "\n<option value=''></option>";
-    $SQLexitReason = "SELECT * FROM keyStatusReason WHERE reasonArea = 'exitStatus' and orderNumber !=0" ;
-    $result = mysql_query($SQLexitReason,  $connection) or die("There were problems connecting to the status reasons data.  If you continue to have problems please contact us.<br/>");
-    $i="";
-    while($row = mysql_fetch_assoc($result)){
+$exitReason_menuOptions = "\n<option value=''></option>";
+$SQLexitReason = "SELECT * FROM keyStatusReason WHERE reasonArea = 'exitStatus' and orderNumber !=0" ;
+$result = mysql_query($SQLexitReason,  $connection) or die("There were problems connecting to the status reasons data.  If you continue to have problems please contact us.<br/>");
+$i="";
+while($row = mysql_fetch_assoc($result)){
 	$i++;
 	if($row['keyStatusReasonID']==$keyStatusReasonID) $selectedOption = ' selected';
 	$exitReason_menuOptions .= "\n<option".$selectedOption." value='".$row['keyStatusReasonID']."'>". $row['reasonText']."</option>";
 	$selectedOption = "";
-
-    }
-    //$arrExitReason_menuOptions = mysql_fetch_assoc($result)
+	
+}
+//$arrExitReason_menuOptions = mysql_fetch_assoc($result)
 
 ################################################################################################################
 //Create form inputs for resource specialist.
-    $rs_menuOptions = "\n<option value=0>--Select All--</option>";
-    $SQLrs = "SELECT * FROM keyResourceSpecialist WHERE current = '1' order by rsName" ;
-    $result = mysql_query($SQLrs,  $connection) or die("There were problems connecting to the resource specialist data.  If you continue to have problems please contact us.<br/>");
-    while($row = mysql_fetch_assoc($result)){
+$rs_menuOptions = "\n<option value=0>--Select All--</option>";
+$SQLrs = "SELECT * FROM keyResourceSpecialist WHERE current = '1' order by rsName" ;
+$result = mysql_query($SQLrs,  $connection) or die("There were problems connecting to the resource specialist data.  If you continue to have problems please contact us.<br/>");
+while($row = mysql_fetch_assoc($result)){
 	if($row['keyResourceSpecialistID']==$keyResourceSpecialistID) $selectedOption = ' selected';
 	$rs_menuOptions .= "\n<option".$selectedOption." value='".$row['keyResourceSpecialistID']."'>". $row['rsName']."</option>";
 	$selectedOption = "";
-    }
+}
 ################################################################################################################
 //Create form inputs for school district.
-    $sd_menuOptions = "\n<option value=0>--Select All--</option>";
-    $SQLsd = "SELECT * FROM keySchoolDistrict" ;
-    $result = mysql_query($SQLsd,  $connection) or die("There were problems connecting to the school district data.  If you continue to have problems please contact us.<br/>");
-    while($row = mysql_fetch_assoc($result)){
+$sd_menuOptions = "\n<option value=0>--Select All--</option>";
+$SQLsd = "SELECT * FROM keySchoolDistrict" ;
+$result = mysql_query($SQLsd,  $connection) or die("There were problems connecting to the school district data.  If you continue to have problems please contact us.<br/>");
+while($row = mysql_fetch_assoc($result)){
 	if($row['keySchoolDistrictID']==$keySchoolDistrictID) $selectedOption = ' selected';
 	$sd_menuOptions .= "\n<option".$selectedOption." value='".$row['keySchoolDistrictID']."'>". $row['schoolDistrict']."</option>";
 	$selectedOption = "";
-    }
+}
 ################################################################################################################
 //Set search date default values if no value has been saved yet in Session.
 $searchEndDate = date('Y-m-d');
@@ -151,6 +151,13 @@ function showReportFilters(area, value){
     	    if(value == 'gtcapplicant'){
         	    $('#searchProgramLabel').hide();
         	    $('#searchProgram').hide();
+    	    }
+    	    if(value == 'riskFactor' || value == 'topCareers'){
+                $('#searchProgramLabel').hide();
+                $('#searchProgram').hide();
+                $('#searchSchoolDistrictIDLabel').hide();
+                $('#searchSchoolDistrictID').hide();
+        	    $('#timeFrame').hide();
     	    }
         }
     	if(area == 'searchProgram'){
@@ -256,6 +263,9 @@ function showReportFilters(area, value){
 						<option value='enrolledDuring'>Enrollment During</option>
 						<option value='activeDuring'>Active During</option>
 						<option value='exitDuring'>Exit During</option>
+						<option value='riskFactor'>Risk Factor</option>
+						<option value='topRiskFactors'>Top Risk Factors</option>
+						<option value='topCareers'>Top Careers</option>
 					    </select>
 				    </li>
 				    <li>
