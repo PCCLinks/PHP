@@ -457,19 +457,44 @@ switch($searchReport){
 					switch($searchReport){
 						case 'riskFactor':
 							$reportNameDisplay = "Risk Factor";
-							$sql = "select c.firstName, c.lastName, c.bannerGNumber, rf.riskFactorName
-						from contact c
-							join contactRiskFactor crf on c.contactID = crf.contactID
-						    join riskFactor rf on crf.riskFactorID = rf.riskFactorID
-						order by c.lastname, c.firstname";
+							$sql = "select c.firstName, c.lastName, c.bannerGNumber, rf.riskFactorName, res.rsName Coach
+									from contact c
+										join contactRiskFactor crf on c.contactID = crf.contactID
+									    join riskFactor rf on crf.riskFactorID = rf.riskFactorID
+										join (select contactID, max(statusID) statusID
+										  from status
+										  where keyStatusID = 6
+											and undoneStatusID is null
+										  group by contactID) coachLastStatus
+											on coachLastStatus.contactID = c.contactID
+										join (select sres.statusID, res.rsName, res.keyResourceSpecialistID
+											  from statusResourceSpecialist sres
+												join keyResourceSpecialist res
+													on sres.keyResourceSpecialistID = res.keyResourceSpecialistID) res
+										   on coachLastStatus.statusID = res.statusID";
+							if($searchResourceSpecialistID != 0)
+								$sql = $sql."
+									where res.keyResourceSpecialistID =".$searchResourceSpecialistID;
+							$sql = $sql."
+									order by c.lastname, c.firstname";
 							break;
 						case 'topRiskFactors':
 							$reportNameDisplay = 'Top Risk Factors';
-							$sql = "select riskFactorName 'Risk Factor', count(distinct contactID) '# of Students'
+							$sql = "select riskFactorName 'Risk Factor', count(distinct crf.contactID) '# of Students'
 					from contactRiskFactor crf
-						join riskFactor rf on crf.riskFactorID = rf.riskFactorID
+						join riskFactor rf on crf.riskFactorID = rf.riskFactorID";
+							if($searchProgram != "0"){
+								$sql = $sql."
+						join (select contactId, max(concat(statusDate, '|', program)) maxDate
+							  from status
+							  where undoneStatusID is null
+							  group by contactID) lastStatus
+								on lastStatus.contactID = crf.contactID
+					where substring_index(maxDate,'|',-1) = '".$searchProgram."'";
+							}
+					$sql = $sql."
 					group by riskFactorName
-					order by count(distinct contactID) DESC";
+					order by count(distinct crf.contactID) DESC";
 							break;
 						case 'topCareers':
 							$reportNameDisplay = 'Top Careers';

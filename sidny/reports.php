@@ -141,7 +141,7 @@ function showReportFilters(area, value){
             $('#searchSchoolDistrictIDLabel').show();
             $('#searchSchoolDistrictID').show();
     	    $('#timeFrame').show();
-            if(value == 'exitDuring'){
+            if(value == 'exitDuring' || value == 'riskFactor'){
                 $('#searchResourceSpecialistIDLabel').show();
             	$('#searchResourceSpecialistID').show();
             }else{
@@ -152,16 +152,18 @@ function showReportFilters(area, value){
         	    $('#searchProgramLabel').hide();
         	    $('#searchProgram').hide();
     	    }
-    	    if(value == 'riskFactor' || value == 'topCareers'){
-                $('#searchProgramLabel').hide();
-                $('#searchProgram').hide();
+    	    if(value == 'riskFactor' || value == 'topCareers' || value == 'topRiskFactors'){
+        	    if(value != 'topRiskFactors'){
+                	$('#searchProgramLabel').hide();
+                	$('#searchProgram').hide();
+        	    }
                 $('#searchSchoolDistrictIDLabel').hide();
                 $('#searchSchoolDistrictID').hide();
         	    $('#timeFrame').hide();
     	    }
         }
     	if(area == 'searchProgram'){
-    	    if(value == 'ytc'){
+    	    if(value == 'ytc' && $('#searchReport').val() != 'topRiskFactors'){
         	    $('#searchProgramDetailLabel').show();
         	    $('#searchProgramDetail').show();
     	    }else{
